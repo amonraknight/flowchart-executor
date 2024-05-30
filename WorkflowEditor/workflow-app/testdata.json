@@ -1,0 +1,10 @@
+{
+	"ai": {
+		"codereply": "# Assuming the data is already loaded into the variable 'dataframe'\n\nclass_counts = dataframe['Class'].value_counts().to_dict()",
+		"messagereply": "This is the message reply." 
+	},
+	"result": {
+		"message": "Scripts executed successfully.",
+		"log": "This is the log message."
+	}
+}

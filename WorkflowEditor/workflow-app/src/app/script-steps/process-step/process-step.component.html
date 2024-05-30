@@ -1,0 +1,36 @@
+<div [class]="data.focused ?  stepClassFocused:stepClassNoFocus" #canvasContent (click)="setFocus()">
+    <i class="bi bi-terminal" width="16" height="16" fill="currentColor"></i>
+    <span>{{ data.name }}</span>
+    <!--<i class="bi bi-x-circle-fill close-icon" (click)="delete()"></i>-->
+
+    <div class="btn-group step-btns" role="group" aria-label="Basic outlined example">
+        <button type="button" class="btn btn-outline-light" (click)="openModal()">Open Detail</button>
+        <button type="button" class="btn btn-outline-light" (click)="delete()">Delete</button>
+      </div>
+</div>
+
+
+<div *ngIf="showModal" class = "popup-modal">
+    <div class="modal-content">
+        <i class="bi bi-x-circle-fill close-icon" (click)="closeModal()"></i>
+            <div class="mb-3">
+                <label class="form-label">Step Name</label>
+                <input type="text" class="form-control" [(ngModel)]="data.name" />
+           </div>
+            <div class="mb-3">
+                <label class="form-label">Python Script</label>
+                <ngx-codemirror [(ngModel)]="data.pythonCode" [options]="{lineNumbers: true, theme: 'material', mode: 'python'}"></ngx-codemirror>
+            </div>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-dark" (click)="saveAsCustomizedStep()">save as customized step</button>
+                <button type="button" class="btn btn-dark" *ngIf="!showChat" (click)="openChat()">ask AI</button>
+                <button type="button" class="btn btn-dark" *ngIf="showChat" (click)="closeChat()">close chat</button>
+            </div>
+        </div>
+    <div class="modal-chat" *ngIf="showChat">
+        <app-chat-box [predecessorSteps]="getPredecessorScripts(3)" (renewScriptEvent)="renewScript($event)"></app-chat-box>
+    </div>
+</div>
+
+
+

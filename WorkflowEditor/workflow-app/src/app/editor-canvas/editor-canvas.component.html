@@ -1,0 +1,153 @@
+<main>
+  <!--The palette-->
+  <div id="palette" class="d-flex flex-column text-bg-dark">
+    <span class="fs-4" *ngIf="!workflowNameInEdit" (click)="editWorkflowName()">{{workflowName}}</span>
+    <input id="workflowNameInput"  type="text" *ngIf="workflowNameInEdit" [(ngModel)]="workflowName" (blur)="editWorkflowName()" />
+    <hr>
+    <section>
+      <div
+        class="plugin-op"
+        *ngFor="let op of customOps"
+        [ngFlowchartStep]="op.step">
+        <i [class]="op.step.icon" width="16" height="16" fill="currentColor"></i>
+        <span>{{ op.paletteName }}</span>
+        <!-- <i class="bi bi-x-circle-fill close-icon" *ngIf="op.step.data.id>0" (click)="deleteCustomizedStep(op.step.data.id)"></i> -->
+        <i class="bi bi-x-circle-fill close-icon" *ngIf="op.step.data.id>0" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" (click)="stepToDelete=op"></i>
+      </div>
+      
+    </section>
+<!--
+    <section>
+      <button (click)="showFlowData()">Show JSON</button>
+      <button (click)="showUpload()">Upload JSON</button>
+    </section>
+-->
+    <section>
+      <div class="sub-section">
+        <label for="step-gap-select" class="wide">Step Gap</label>
+        <select
+          #select_1
+          name="step-gap-select"
+          id="step-gap-select"
+          class="wide"
+          (change)="onGapChanged(select_1.value)">
+          <option value="30">30</option>
+          <option value="40" selected>40</option>
+          <option value="60">60</option>
+        </select>
+      </div>
+      <div class="sub-section">
+        <input
+          #input_1
+          type="checkbox"
+          name="sequential"
+          (change)="onSequentialChange(input_1.checked)" />
+        <label for="sequential">Sequential</label>
+        
+      </div>
+      <div class="sub-section">
+        <input
+          #input_2
+          type="checkbox"
+          name="orientation"
+          (change)="onOrientationChange(input_2.checked)" />
+        <label for="orientation">Horizontal Orientation</label>
+        
+      </div>
+      <div class="sub-section">
+        <input
+          type="checkbox"
+          name="disabled"
+          (change)="disabled = $any($event).target.checked" />
+        <label for="disabled">Disabled</label>
+        
+      </div>
+    </section>
+    <section>
+      <button class="btn btn-dark fs-4" type="button" (click)="clearData()">
+        <i class="bi bi-trash3"></i>
+        Clear Flow
+      </button>
+    </section>
+    <section>
+      <button (click)="onGrow()">+</button>
+      <button (click)="onShrink()">-</button>
+      <button (click)="onReset()">Reset</button>
+    </section>
+    <ng-template #normalStep let-data>
+      <div
+        class="card"
+        [attr.name]="data.data.name"
+        #card
+        (click)="onDelete(data.id)">
+        <span>{{ data.data.name }}</span>
+      </div>
+    </ng-template>
+  </div>
+
+  <!--The drop down buttons.-->
+  <div id="rightcolumn">
+    <!-- actions bar-->
+    <div class="d-inline-flex gap-1 text-bg-dark">
+      <button class="btn btn-dark fs-4" type="button" (click)="saveWorkflow()">
+        <i class="bi bi-save"></i>
+        Save
+      </button>
+      <button class="btn btn-dark fs-4" type="button" (click)="showFlowData()">
+        <i class="bi bi-download"></i>
+        Export
+      </button>
+      <button class="btn btn-dark fs-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+        <i class="bi bi-play-btn"></i>
+        Execute
+      </button>
+    </div>
+    <div class="collapse" id="collapseExample">
+      <div class="card-body">
+        <button type="button" class="btn btn-outline-dark exe-button" (click)="executeAll()">
+          <i class="bi bi-chevron-double-right"></i>
+          Execute All
+        </button>
+        <button type="button" class="btn btn-outline-dark exe-button" (click)="executeStep()">
+          <i class="bi bi-chevron-bar-right"></i>
+          Execute Step
+        </button>
+        <button type="button" class="btn btn-outline-dark exe-button" (click)="executeAllSince()">
+          <i class="bi bi-chevron-right"></i>
+          Execute All Since
+        </button>
+      </div>
+    </div>
+    
+    
+    <!--The canvas.-->
+    <div
+      id="canvas"
+      ngFlowchartCanvas
+      [ngFlowchartOptions]="options"
+      [ngFlowchartCallbacks]="callbacks"
+      [disabled]="disabled">
+    </div>
+  </div>
+
+</main>
+
+<!-- Modal confirm delete -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="confirmDeleteModalLabel">Please confirm</h1>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        <i class="bi bi-x-circle-fill close-icon" data-bs-dismiss="modal" aria-label="Close"></i>
+      </div>
+      <div class="modal-body">
+        Are you sure to delete processor {{stepToDelete.step.data.name}}?
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-dark" (click)="deleteCustomizedStep(stepToDelete.step.data.id)" data-bs-dismiss="modal">Confirm</button>
+          <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

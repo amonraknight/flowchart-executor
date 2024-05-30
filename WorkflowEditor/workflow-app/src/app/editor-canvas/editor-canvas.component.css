@@ -1,0 +1,112 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  main {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    width: 100vw;
+  }
+  
+  #palette {
+    width: 20%;
+    height: 100%;
+    padding: 16px;
+  
+    & .plugin-op {
+      padding: 12px;
+      user-select: none;
+      /*display: block;*/
+      position: relative;
+      border: 2px solid whitesmoke;
+      border-radius: 10px;
+      margin: 0.3em;
+  
+      &:hover {
+        background: rgba(0, 0, 0, 0.04);
+      }
+
+      & .close-icon {
+        position: absolute;
+        top: 0; /* 距离容器顶部0像素 */
+        right: 0; /* 距离容器右侧0像素 */
+      }
+    }
+
+
+  }
+
+  #rightcolumn {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    height: 100%;
+  }
+
+  #canvas {
+    height: calc(100% - 50px);
+    background: #f0f0f0;
+    flex: 1;
+    /*margin: 50px 0 50px 0;*/
+    background-size: 30px 30px;
+    background-image: linear-gradient(to right, #d9d9d9 1px, transparent 1px),
+      linear-gradient(to bottom, #d9d9d9 1px, transparent 1px);
+  }
+  
+  section {
+    padding: 1em;
+    border-bottom: 1px solid lightgrey;
+  
+    & .wide {
+      width: 100%;
+    }
+  }
+  
+  .sub-section {
+    padding: 0.5em 0;
+  }
+  
+  select {
+    padding: 0.3em;
+  }
+  
+  .card {
+    padding: 1em;
+    background: white;
+    box-shadow: 0px 4px 2em rgba(22, 33, 74, 0.05);
+    border-radius: 4px;
+    min-width: 12em;
+    height: 4em;
+  }
+  
+  div#canvas[disabled='true'] {
+    opacity: 0.7;
+  }
+  
+  div#canvas[disabled='true'] ::ng-deep.ngflowchart-step-wrapper {
+    opacity: 0.7;
+  }
+
+  .bi {
+    padding: 5px;
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .exe-button {
+    margin-left: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .close-icon {
+    position: absolute;
+    top: 10px; 
+    right: 10px;
+  }
+  
+

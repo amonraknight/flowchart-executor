@@ -1,0 +1,53 @@
+{
+    "root": {
+        "id": "s1714177496863",
+        "type": "process-step",
+        "data": {
+            "name": "Process Step 1",
+            "prompt": "",
+            "pythonCode": "import pandas as pd\n\ncsv_file_path = 'E:/testfield/python/iristest/data/iris.data'\ndf = pd.read_csv(csv_file_path)",
+            "loopOver": "",
+            "focused": true
+        },
+        "children": [
+            {
+                "id": "s1714177889309",
+                "type": "process-step",
+                "data": {
+                    "name": "Process Step 2",
+                    "prompt": "",
+                    "pythonCode": "output_file_path = 'E:/testfield/python/iristest/data/iris.csv'\ndf.to_csv(output_file_path, index=False)",
+                    "loopOver": "",
+                    "focused": false
+                },
+                "children": []
+            },
+            {
+                "id": "s1714178143901",
+                "type": "process-step",
+                "data": {
+                    "name": "Process Step 3",
+                    "prompt": "",
+                    "pythonCode": "filtered_df = df[df.iloc[:, 4] == 'Iris-setosa']\n",
+                    "loopOver": "",
+                    "focused": false
+                },
+                "children": [
+                    {
+                        "id": "s1714178453655",
+                        "type": "process-step",
+                        "data": {
+                            "name": "Process Step 4",
+                            "prompt": "",
+                            "pythonCode": "output_file_path = 'E:/testfield/python/iristest/data/iris_setosa.csv'\nfiltered_df.to_csv(output_file_path, index=False)",
+                            "loopOver": "",
+                            "focused": false
+                        },
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "connectors": []
+}
