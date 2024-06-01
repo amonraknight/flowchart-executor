@@ -168,3 +168,6 @@ cython_debug/
 # Idea project file:
 aiflowchartserver/.idea/*
 
+# Test notebooks:
+*.ipynb
+
