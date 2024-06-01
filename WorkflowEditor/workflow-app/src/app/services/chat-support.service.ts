@@ -16,10 +16,6 @@ export class ChatSupportService extends CommonRequestService {
   //private aiUrl = 'api/ai';
   private aiUrl = environment.baseServerUrl + '/aiagent/getaireply';
 
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json'})
-  };
-
   sendMessages(predecessorScripts: string[], messages: ChatMessage[]): Observable<ResponseFromBack> {
     //console.log(messages)
     let promptToAI: PromptToAI = {

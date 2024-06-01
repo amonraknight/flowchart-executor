@@ -1,0 +1,27 @@
+<table class="table table-dark table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Workflow ID</th>
+        <th scope="col">Workflow Name</th>
+        <th scope="col">Description</th>
+        <th scope="col">Creater ID</th>
+        <th scope="col">Create Date</th>
+        <th scope="col">Update Date</th>
+        <th scope="col">Operations</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="wf-tb" *ngFor="let eachWorkflow of workflows">
+        <th scope="row">{{eachWorkflow.workflow_id}}</th>
+        <td>{{eachWorkflow.workflow_name}}</td>
+        <td>{{eachWorkflow.description}}</td>
+        <td>{{eachWorkflow.creater_id}}</td>
+        <td>{{eachWorkflow.create_date | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
+        <td>{{eachWorkflow.update_date | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
+        <td>
+          <button type="button" class="btn btn-dark btn-outline-light" routerLink="/canvas/{{eachWorkflow.workflow_id}}">open</button>
+          <button type="button" class="btn btn-dark btn-outline-light" (click)="deleteWorkflow(eachWorkflow.workflow_id)">delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { HttpHeaders } from '@angular/common/http';
 
 
 @Injectable({
@@ -9,6 +10,10 @@ import { Observable, of } from 'rxjs';
 export class CommonRequestService {
 
   constructor(public http: HttpClient) { }
+
+  httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
 
   public log(message: string) {
     console.log(message)

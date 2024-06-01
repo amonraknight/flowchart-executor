@@ -83,13 +83,16 @@ def getAllWorkflows(request):
 			workflowDict = {
 				'workflow_id': eachWorkflow.workflow_id,
 				'workflow_name': eachWorkflow.workflow_name,
-				'description': eachWorkflow.description
+				'description': eachWorkflow.description,
+				'creater_id': eachWorkflow.creater_id,
+				'create_date': eachWorkflow.create_date,
+				'update_date': eachWorkflow.update_date
 			}
 
 			workflowList.append(workflowDict)
 
 		data = {
-			'processor': workflowList
+			'workflows': workflowList
 		}
 
 		response = GeneralResponseBody(message='Workflows acquired.', data=data)
@@ -112,7 +115,7 @@ def getWorkflowByID(request, workflow_id):
 			'workflow_id': targetWorkflow.workflow_id,
 			'workflow_name': targetWorkflow.workflow_name,
 			'description': targetWorkflow.description,
-			'step_json': json.loads(targetWorkflow.step_json)
+			'workflow_json': json.loads(targetWorkflow.workflow_json)
 		}
 
 		data = {
@@ -180,23 +183,26 @@ def saveWorkflow(request):
 	if request.method == 'POST':
 		requestToSaveWorkflow = parseJsonString(request.body, RequestToSaveWorkflow)
 
-		if hasattr(requestToSaveWorkflow, 'workflowID') and requestToSaveWorkflow.workflowID:
+		# 0 is the filler workflow ID when it is not in DB yet.
+		if hasattr(requestToSaveWorkflow, 'workflowID') and requestToSaveWorkflow.workflowID > 0:
 			# Existing item
 			try:
 				workflow = Workflow.objects.get(pk=requestToSaveWorkflow.workflowID)
 			except Workflow.DoesNotExist:
-				Http404('Workflow in ID %d not found.' % requestToSaveWorkflow.workflowID)
+				# Http404('Workflow in ID %d not found.' % requestToSaveWorkflow.workflowID)
+				workflow = Workflow()
+				workflow.create_date = timezone.now()
 		else:
 			# new item
 			workflow = Workflow()
+			workflow.create_date = timezone.now()
 
 		# Fill details
 		workflow.workflow_name = requestToSaveWorkflow.workflowName
 		workflow.workflow_json = requestToSaveWorkflow.workflowJson
 		workflow.description = requestToSaveWorkflow.description
 		workflow.creater_id = requestToSaveWorkflow.createrID
-		workflow.create_date = timezone.now
-		workflow.update_date = timezone.now
+		workflow.update_date = timezone.now()
 
 		workflow.save()
 

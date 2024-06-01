@@ -15,9 +15,7 @@ Django 5.0.4
 django-cors-headers 4.3.1
 mysqlclient 2.2.4
 
-### Database
 
-This project depends on a MySQL database 8.0.23. 
 
 ### Structure
 
@@ -30,6 +28,10 @@ This project depends on a MySQL database 8.0.23.
 4. **utils** has all utilities.
 
 5. **zhipuvisit** contains the tools for Zhipu API visiting.
+
+### Database
+
+This project depends on a MySQL database 8.0.23. 
 
 
 ### Configurations
@@ -45,6 +47,11 @@ default-character-set = utf8
 ```
 
 2. To activate AI programing, add your Zhipu API key to "\flowchart-executor\aiflowchartserver\zhipuvisit\apikey.txt".
+
+# Data model migration
+
+Execute "python manage.py migrate" at "\flowchart-executor\aiflowchartserver" to migrate the models to DB. 
+
 
 ### Start Server
 

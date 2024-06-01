@@ -1,17 +1,21 @@
 import { AfterViewInit, Component, TemplateRef, ViewChild, ChangeDetectionStrategy, ElementRef } from '@angular/core';
 import { NgFlowchart, NgFlowchartStepRegistry, NgFlowchartCanvasDirective } from '@joelwenzel/ng-flowchart';
+/*
 import { CustomStepComponent } from '../custom-step/custom-step.component';
 import { RouteStepComponent } from '../custom-step/route-step/route-step.component';
 import { FormStepComponent } from '../form-step/form-step.component';
-import { NestedFlowComponent } from '../nested-flow/nested-flow.component';
-import { ProcessStepComponent } from '../script-steps/process-step/process-step.component';
 import { ConditionalRedirectStepComponent } from '../script-steps/conditional-redirect-step/conditional-redirect-step.component';
 import { RepeatStepComponent } from '../script-steps/repeat-step/repeat-step.component';
+*/
+import { ActivatedRoute } from '@angular/router';
+import { NestedFlowComponent } from '../nested-flow/nested-flow.component';
+import { ProcessStepComponent } from '../script-steps/process-step/process-step.component';
 import { StepInfo } from '../interfaces/stepInfo'
 import { ExecutionSupportService } from '../services/execution-support.service';
 import { StepEditorCommunicationService } from '../services/step-editor-communication.service';
 import { CustomizationSupportService } from '../services/customization-support.service';
 import { ApplicationRef } from '@angular/core';
+import { WorkflowSupportService } from '../services/workflow-support.service';
 
 @Component({
   selector: 'app-editor-canvas',
@@ -40,8 +44,8 @@ export class EditorCanvasComponent implements AfterViewInit {
   normalStepTemplate!: TemplateRef<any>;
 
   //sampleJson = '{"root":{"id":"s1674421266194","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[{"id":"s1674421267975","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[{"id":"s1674421269738","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[]}]},{"id":"s1674421268826","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[]}]},"connectors":[{"startStepId":"s1674421269738","endStepId":"s1674421268826"}]}';
-  //sampleJson = '{"root": {"id": "s1715319429481","type": "process-step","data": {"name": "Process Step1","prompt": "","pythonCode": "111","loopOver": "","focused": false},"children": [{"id": "s1715319434481","type": "process-step","data": {"name": "Process Step2","prompt": "","pythonCode": "222","loopOver": "","focused": false},"children": []},{"id": "s1715319430974","type": "process-step","data": {"name": "Process Step3","prompt": "","pythonCode": "333","loopOver": "","focused": false},"children": []}]},"connectors": []}'
   sampleJson = '{"root": {"id": "s1715319429481","type": "process-step","data": {"name": "Read CSV file","prompt": "","pythonCode": "\\n\\nimport pandas as pd\\n\\n# Define the path to your CSV file\\nfile_path = r\\"E:\\\\testfield\\\\python\\\\iristest\\\\data\\\\iris.csv\\"  # Replace \'your_file.csv\' with the actual file name\\n\\n# Read the CSV file into a Pandas DataFrame\\ndf = pd.read_csv(file_path)\\n\\n# Display the DataFrame to verify the content\\nprint(df)\\n","loopOver": "", "focused": false, "id": 26 }, "children": [ { "id": "s1717202813288", "type": "process-step", "data": { "name": "Count df rows", "prompt": "", "pythonCode": "\\n# Using the shape attribute\\nnum_rows_shape = df.shape[0]\\nprint(f\\"Number of rows using shape: {num_rows_shape}\\")\\n\\n# Using the len() method\\nnum_rows_len = len(df)\\nprint(f\\"Number of rows using len: {num_rows_len}\\")\\n","loopOver": "","focused": true,"id": 27},"children": []}]},"connectors": []}'
+  defaultJson = '{"connectors": []}'
   
   processStepOp: StepInfo = {
     paletteName: 'Process Step',
@@ -107,6 +111,7 @@ export class EditorCanvasComponent implements AfterViewInit {
   disabled = false;
   workflowNameInEdit = false;
   workflowName = 'My Workflow';
+  workflowDescription = 'This is the description.';
 
   // The choosen processor to delete
   stepToDelete: StepInfo = this.processStepOp;
@@ -119,7 +124,7 @@ export class EditorCanvasComponent implements AfterViewInit {
     //this.stepRegistry.registerStep('form-step', FormStepComponent);
     //this.stepRegistry.registerStep('route-step', RouteStepComponent);
     this.stepRegistry.registerStep('process-step', ProcessStepComponent);
-    this.showUpload();
+    this.loadWorkflow();
     this.loadCustomizedSteps();
   }
 
@@ -128,7 +133,9 @@ export class EditorCanvasComponent implements AfterViewInit {
     private customizationSupportService: CustomizationSupportService, 
     private eleRef: ElementRef, 
     private stepEditorCommunicationService: StepEditorCommunicationService,
-    private appRef: ApplicationRef
+    private appRef: ApplicationRef,
+    private workflowSupportService: WorkflowSupportService,
+    private route: ActivatedRoute,
   ) {
     this.callbacks.onDropError = this.onDropError;
     this.callbacks.onMoveError = this.onMoveError;
@@ -184,8 +191,22 @@ export class EditorCanvasComponent implements AfterViewInit {
     
   }
 
-  showUpload(): void {
-    this.canvas?.getFlow().upload(this.sampleJson);
+  loadWorkflow(): void {
+    const workflowID = Number(this.route.snapshot.paramMap.get('workflowID'));
+    let workflowJson;
+    //load workflow Json
+    this.workflowSupportService.requestForWorkflowByID(workflowID).subscribe(response => {
+      workflowJson = response.data.workflow.workflow_json;
+      this.workflowDescription = response.data.workflow.description;
+      this.workflowName = response.data.workflow.workflow_name;
+      this.canvas?.getFlow().upload(workflowJson);
+    })
+
+    if(!workflowJson) {
+      this.canvas?.getFlow().upload(this.defaultJson);
+    }
+
+    
   }
 
   showFlowData(): void {
@@ -277,9 +298,11 @@ export class EditorCanvasComponent implements AfterViewInit {
 
   saveWorkflow():void {
     if(this.canvas) {
-      this.executionSupportService.requestSaveWorkflow(this.workflowName, this.canvas?.getFlow().toJSON(4)).subscribe(data => {
-        console.log(data)
+      this.workflowSupportService.requestSaveWorkflow(0, this.workflowName, this.workflowDescription, this.canvas?.getFlow().toJSON(4), 1)
+      .subscribe(response => {
+        console.log(response)
       });
+    
     }
   }
 

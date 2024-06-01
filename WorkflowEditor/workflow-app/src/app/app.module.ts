@@ -20,6 +20,7 @@ import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { InMemoryDataService } from './services/in-memory-data.service';
 
 import 'node_modules/codemirror/mode/python/python.js';
+import { WorkflowListComponent } from './workflow-list/workflow-list.component';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import 'node_modules/codemirror/mode/python/python.js';
     ProcessStepComponent,
     ConditionalRedirectStepComponent,
     RepeatStepComponent,
-    ChatBoxComponent
+    ChatBoxComponent,
+    WorkflowListComponent
   ],
   imports: [
     BrowserModule,

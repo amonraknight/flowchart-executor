@@ -15,11 +15,8 @@ export class ExecutionSupportService extends CommonRequestService {
   // For test
   // private executionUrl = 'api/result';
   private executionUrl = environment.baseServerUrl + '/flowchartagent/executescript';
-  private saveWorkflowUrl = environment.baseServerUrl + '/flowchartagent/saveworkflow';
 
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
+
 
   requestExection(exeType: string, wholeFlow: string): Observable<ExecutionResult> {
     
@@ -28,19 +25,6 @@ export class ExecutionSupportService extends CommonRequestService {
       flow: wholeFlow
     }
     let subscribe = this.http.post<ExecutionResult>(this.executionUrl, executionRequest, this.httpOptions);
-    return subscribe
-    .pipe(
-      tap(() => this.log('Seceived a reply.')),
-      catchError(this.handleError<ExecutionResult>('post error'))
-    );
-  }
-  
-  requestSaveWorkflow(workflowName: string, wholeFlow: string): Observable<ExecutionResult> {
-    let saveRequest = {
-      workflowName: workflowName,
-      flow: wholeFlow
-    }
-    let subscribe = this.http.post<ExecutionResult>(this.saveWorkflowUrl, saveRequest, this.httpOptions);
     return subscribe
     .pipe(
       tap(() => this.log('Seceived a reply.')),
