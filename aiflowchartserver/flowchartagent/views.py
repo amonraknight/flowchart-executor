@@ -8,7 +8,8 @@ from utils.workflowExecutor import WorkflowExecutor
 from objects.requestToExecution import RequestToExecution
 from objects.requestToSaveProcessor import RequestToSaveProcessor
 from objects.requestToSaveWorkflow import RequestToSaveWorkflow
-from flowchartagent.models import CustomizedProcessor, Workflow, ResultVariables
+from flowchartagent.models import CustomizedProcessor, Workflow
+from objects.generalResponseBody import GeneralResponseBody
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
@@ -34,12 +35,13 @@ def executeScript(request):
 #		print(workflowDict)
 		workflowExecutor = WorkflowExecutor()
 		message, log = workflowExecutor.executeWorkflow(workflowDict, requestToExecution.executionType)
-		body = {
-		  'message': message,
+		data = {
 		  'log': log
 		}
+
+		response = GeneralResponseBody(message=message, data=data)
 		
-		return JsonResponse(body)
+		return JsonResponse(response.getResponseBody())
 	else:
 		Http404("Request method should be POST.")
 
@@ -58,12 +60,13 @@ def getAllSteps(request):
 
 			processorList.append(processorDict)
 
-		responseBody = {
-			'message': 'Processors acquired.',
+		data = {
 			'processors': processorList
 		}
 
-		return JsonResponse(responseBody)
+		response = GeneralResponseBody(message='Processors acquired.', data=data)
+
+		return JsonResponse(response.getResponseBody())
 	else:
 		Http404("Request method should be GET.")
 
@@ -85,12 +88,13 @@ def getAllWorkflows(request):
 
 			workflowList.append(workflowDict)
 
-		responseBody = {
-			'message': 'Workflows acquired.',
+		data = {
 			'processor': workflowList
 		}
 
-		return JsonResponse(responseBody)
+		response = GeneralResponseBody(message='Workflows acquired.', data=data)
+
+		return JsonResponse(response.getResponseBody())
 
 	else:
 		Http404("Request method should be GET.")
@@ -111,12 +115,13 @@ def getWorkflowByID(request, workflow_id):
 			'step_json': json.loads(targetWorkflow.step_json)
 		}
 
-		responseBody = {
-			'message': 'Workflow acquired.',
+		data = {
 			'workflow': workflowDict
 		}
 
-		return JsonResponse(responseBody)
+		response = GeneralResponseBody(message='Workflow acquired.', data=data)
+
+		return JsonResponse(response.getResponseBody())
 	else:
 		Http404("Request method should be GET.")
 
@@ -149,7 +154,8 @@ def saveStep(request):
 			try:
 				step = CustomizedProcessor.objects.get(pk=requestToSaveProcessor.id)
 			except CustomizedProcessor.DoesNotExist:
-				Http404('Processor in ID %d not found.' % requestToSaveProcessor.id)
+				# Http404('Processor in ID %d not found.' % requestToSaveProcessor.id)
+				step = CustomizedProcessor()
 		else:
 			# new item
 			step = CustomizedProcessor()
@@ -162,13 +168,9 @@ def saveStep(request):
 
 		step.save()
 
-		responseBody = {
-			'status': 1,
-			'message': 'Processor saved.',
-			'data': {'processorID': step.processor_id}
-		}
+		response = GeneralResponseBody(message='Processor saved.', data={'processorID': step.processor_id})
 
-		return JsonResponse(responseBody)
+		return JsonResponse(response.getResponseBody())
 	else:
 		Http404("Request method should be POST.")
 
@@ -198,6 +200,10 @@ def saveWorkflow(request):
 
 		workflow.save()
 
+		response = GeneralResponseBody(message='Workflow saved.')
+
+		return JsonResponse(response.getResponseBody())
+
 	else:
 		Http404("Request method should be POST.")
 
@@ -211,8 +217,11 @@ def deleteStep(request, processor_id):
 			return HttpResponseServerError('Processor in ID %d not found.' % processor_id)
 		else:
 			processorToDelete.delete()
-			responseBody = {'status': 1, 'message': 'Processor deleted.', 'data': {'processorID': processor_id}}
-		return JsonResponse(responseBody)
+
+			response = GeneralResponseBody(message='Processor deleted.', data={'processorID': processor_id})
+
+		return JsonResponse(response.getResponseBody())
+
 	else:
 		Http404("Request method should be DELETE.")
 

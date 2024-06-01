@@ -284,8 +284,8 @@ export class EditorCanvasComponent implements AfterViewInit {
   }
 
   loadCustomizedSteps(): void {
-    this.customizationSupportService.requestForAllSteps().subscribe(data => {
-      for (let eachProcessor of data.processors) {
+    this.customizationSupportService.requestForAllSteps().subscribe(response => {
+      for (let eachProcessor of response.data.processors) {
         let currentStep: StepInfo = {
           paletteName: eachProcessor.name,
             step: {

@@ -30,14 +30,14 @@ export class ChatBoxComponent {
     this.userInput = '';
 
     this.chatSupportService.sendMessages(this.predecessorSteps, this.messages)
-      .subscribe(data => {
+      .subscribe(response => {
         //console.log(data)
         let assistantMessage: ChatMessage = {
           role: 'assistant',
-          content: data.messagereply
+          content: response.data.messagereply
         };
         this.messages.push(assistantMessage);
-        this.renewScript(data.codereply);
+        this.renewScript(response.data.codereply);
       });
   }
 

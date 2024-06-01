@@ -7,6 +7,7 @@ import re
 from utils.jsonutil import parseJsonString
 from objects.requestToAI import RequestToAI
 from zhipuvisit.zhipubase import ZhipuBase
+from objects.generalResponseBody import GeneralResponseBody
 
 
 def index(request):
@@ -16,17 +17,7 @@ def index(request):
 '''
 Request sample:
 
-{
-	"predecessorScripts": [
-		"# Assuming the data is already loaded into the variable 'dataframe'\\n\\nclass_counts = dataframe['Class'].value_counts().to_dict()"
-	],
-	"messages": [
-		{
-			"role": "user",
-			"message": "asdasd"
-		}
-	]
-}
+'{"predecessorScripts":["\\n# Using the shape attribute\\nnum_rows_shape = df.shape[0]\\nprint(f\\"Number of rows using shape: {num_rows_shape}\\")\\n\\n# Using the len() method\\nnum_rows_len = len(df)\\nprint(f\\"Number of rows using len: {num_rows_len}\\")\\n","\\n\\nimport pandas as pd\\n\\n# Define the path to your CSV file\\nfile_path = r\\"E:\\\\testfield\\\\python\\\\iristest\\\\data\\\\iris.csv\\"  # Replace \'your_file.csv\' with the actual file name\\n\\n# Read the CSV file into a Pandas DataFrame\\ndf = pd.read_csv(file_path)\\n\\n# Display the DataFrame to verify the content\\nprint(df)\\n"],"messages":[{"role":"user","content":"I want to find how many rows have \\"Iris-virginica\\" at the 5th column."}]}'
 '''
 
 
@@ -61,12 +52,14 @@ def getAIReply(request):
         for eachMessage in messageStrs:
             messagereply = messagereply + '\n' + eachMessage
 
-        body = {
+        data = {
             "codereply": codereply,
             "messagereply": messagereply
         }
 
-        return JsonResponse(body)
+        response = GeneralResponseBody(message='AI reply acquired.', data=data)
+
+        return JsonResponse(response.getResponseBody())
     else:
         Http404("Request method should be POST.")
 
@@ -74,7 +67,7 @@ def getAIReply(request):
 # Prepare the request messages to Zhipu.
 def _createZhipuMessages(inputRequestToAI):
     messages = []
-    messages.append({'role': 'system', 'content': 'The user wants you to write Python according to his purpose.'})
+    messages.append({'role': 'system', 'content': 'The user wants you to write Python according to his purpose. Please put the script in context in consideration.'})
     if inputRequestToAI.predecessorScripts:
         scriptList = list(reversed(inputRequestToAI.predecessorScripts))
         for eachScript in scriptList:
