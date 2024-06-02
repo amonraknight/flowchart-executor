@@ -65,6 +65,10 @@ If to run in commandline, execute `python manage.py runserver 8100`.
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.0.
 
+The flowchart is applying [ng-flowchart](https://github.com/joel-wenzel/ng-flowchart). 
+
+The frontend depends on [Bootstrap](https://v5.bootcss.com/docs/getting-started/introduction/) v5.
+
 ### Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.

@@ -5,7 +5,10 @@ import { WorkflowListComponent } from './workflow-list/workflow-list.component';
 
 const routes: Routes = [
   { path: 'canvas/:workflowID', component: EditorCanvasComponent },
+  { path: 'canvas', component: EditorCanvasComponent },
+  { path: '', component: WorkflowListComponent },
   { path: 'workflowlist', component: WorkflowListComponent }
+  
 ];
 
 @NgModule({

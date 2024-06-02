@@ -67,7 +67,8 @@ def getAIReply(request):
 # Prepare the request messages to Zhipu.
 def _createZhipuMessages(inputRequestToAI):
     messages = []
-    messages.append({'role': 'system', 'content': 'The user wants you to write Python according to his purpose. Please put the script in context in consideration.'})
+    messages.append({'role': 'system',
+                     'content': 'The user wants you to write Python according to his purpose. Please put the script in context in consideration. Don\'t repeat the existing codes.' })
     if inputRequestToAI.predecessorScripts:
         scriptList = list(reversed(inputRequestToAI.predecessorScripts))
         for eachScript in scriptList:

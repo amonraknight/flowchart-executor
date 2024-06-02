@@ -37,7 +37,7 @@
 
   }
 
-  #rightcolumn {
+  #top-rightrow {
     display: flex;
     flex-direction: column;
     width: 80%;
@@ -108,5 +108,13 @@
     top: 10px; 
     right: 10px;
   }
-  
+
+  .left-div {
+    width: 90%;
+  }
+
+  .right-div {
+    width: 10%;
+  }
+
 

@@ -41,6 +41,7 @@ workflowDict = {
   deleteWorkflow(workflowID: number): void {
     this.workflowSupportService.requestDeleteWorkflowByID(workflowID).subscribe(response => {
       console.log(response);
+      this.getAllWorkflowInfo();
     })
   }
 }

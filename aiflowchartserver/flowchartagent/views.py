@@ -240,8 +240,10 @@ def deleteWorkflow(request, workflow_id):
 			return HttpResponseServerError('Workflow in ID %d not found.' % workflow_id)
 		else:
 			workflowToDelete.delete()
-			responseBody = {'workflowID': workflow_id, 'message': 'Workflow deleted.'}
-		return JsonResponse(responseBody)
+
+			response = GeneralResponseBody(message='Workflow deleted.', data={'workflowID': workflow_id})
+
+		return JsonResponse(response.getResponseBody())
 	else:
 		Http404("Request method should be DELETE.")
 

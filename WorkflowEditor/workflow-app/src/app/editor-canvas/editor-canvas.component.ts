@@ -110,6 +110,7 @@ export class EditorCanvasComponent implements AfterViewInit {
 
   disabled = false;
   workflowNameInEdit = false;
+  workflowID = 0
   workflowName = 'My Workflow';
   workflowDescription = 'This is the description.';
 
@@ -193,20 +194,26 @@ export class EditorCanvasComponent implements AfterViewInit {
 
   loadWorkflow(): void {
     const workflowID = Number(this.route.snapshot.paramMap.get('workflowID'));
+    
     let workflowJson;
-    //load workflow Json
-    this.workflowSupportService.requestForWorkflowByID(workflowID).subscribe(response => {
-      workflowJson = response.data.workflow.workflow_json;
-      this.workflowDescription = response.data.workflow.description;
-      this.workflowName = response.data.workflow.workflow_name;
-      this.canvas?.getFlow().upload(workflowJson);
-    })
+
+    if (workflowID) {
+      
+      //load workflow Json
+      this.workflowSupportService.requestForWorkflowByID(workflowID).subscribe(response => {
+        workflowJson = response.data.workflow.workflow_json;
+        this.workflowDescription = response.data.workflow.description;
+        this.workflowName = response.data.workflow.workflow_name;
+        this.workflowID = response.data.workflow.workflow_id;
+        this.canvas?.getFlow().upload(workflowJson);
+      })
+  
+      
+    }
 
     if(!workflowJson) {
       this.canvas?.getFlow().upload(this.defaultJson);
     }
-
-    
   }
 
   showFlowData(): void {
@@ -298,7 +305,7 @@ export class EditorCanvasComponent implements AfterViewInit {
 
   saveWorkflow():void {
     if(this.canvas) {
-      this.workflowSupportService.requestSaveWorkflow(0, this.workflowName, this.workflowDescription, this.canvas?.getFlow().toJSON(4), 1)
+      this.workflowSupportService.requestSaveWorkflow(this.workflowID, this.workflowName, this.workflowDescription, this.canvas?.getFlow().toJSON(4), 1)
       .subscribe(response => {
         console.log(response)
       });

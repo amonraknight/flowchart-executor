@@ -1,4 +1,11 @@
+.top-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
 .wf-tb {
     text-align: left; /* 水平居中 */
     vertical-align: middle; /* 垂直居中 */
 }
+
