@@ -12,7 +12,9 @@ export class WorkflowListComponent {
 
   }
 
-  workflows: any = []
+  workflows: any = [];
+  confirmModalOn = false;
+  workflowToDelete: any;
 
   ngAfterViewInit() {
     this.getAllWorkflowInfo();
@@ -43,5 +45,13 @@ workflowDict = {
       console.log(response);
       this.getAllWorkflowInfo();
     })
+  }
+
+  confirmDeleteWorkflow(choice: boolean): void {
+    if (choice) {
+      this.deleteWorkflow(this.workflowToDelete.workflow_id);
+    }
+
+    this.confirmModalOn = false;
   }
 }

@@ -113,7 +113,8 @@ export class EditorCanvasComponent implements AfterViewInit {
   workflowID = 0
   workflowName = 'My Workflow';
   workflowDescription = 'This is the description.';
-
+  // The flag controlling the visibility of the confirm modal.
+  confirmModalOn = false;
   // The choosen processor to delete
   stepToDelete: StepInfo = this.processStepOp;
 
@@ -362,6 +363,18 @@ export class EditorCanvasComponent implements AfterViewInit {
       this.loadCustomizedSteps();
       this.appRef.tick();
     })
+  }
+
+  // Receive the output from the modal
+  confirmDeleteCustomizedStep(choice: boolean) {
+    if (choice) {
+      // Confirm to delete.
+      this.deleteCustomizedStep(this.stepToDelete.step.data.id);
+      
+    }
+   
+    this.confirmModalOn = false;
+    
   }
 }
 

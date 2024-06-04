@@ -11,8 +11,8 @@
         [ngFlowchartStep]="op.step">
         <i [class]="op.step.icon" width="16" height="16" fill="currentColor"></i>
         <span>{{ op.paletteName }}</span>
-        <!-- <i class="bi bi-x-circle-fill close-icon" *ngIf="op.step.data.id>0" (click)="deleteCustomizedStep(op.step.data.id)"></i> -->
-        <i class="bi bi-x-circle-fill close-icon" *ngIf="op.step.data.id>0" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" (click)="stepToDelete=op"></i>
+        <!-- <i class="bi bi-x-circle-fill close-icon" *ngIf="op.step.data.id>0" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" (click)="stepToDelete=op"></i> -->
+        <i class="bi bi-x-circle-fill close-icon" *ngIf="op.step.data.id>0" (click)="stepToDelete=op; confirmModalOn = true;"></i>
       </div>
       
     </section>
@@ -146,12 +146,12 @@
 </main>
 
 <!-- Modal confirm delete -->
+<!--
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="confirmDeleteModalLabel">Please confirm</h1>
-        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
         <i class="bi bi-x-circle-fill close-icon" data-bs-dismiss="modal" aria-label="Close"></i>
       </div>
       <div class="modal-body">
@@ -164,3 +164,10 @@
     </div>
   </div>
 </div>
+-->
+
+<app-confirm-modal 
+  *ngIf="confirmModalOn" 
+  [bodyText]="'Are you sure to delete processor \'' + stepToDelete.step.data.name + '\'?'"
+  (confirmEvent)="confirmDeleteCustomizedStep($event)"
+></app-confirm-modal>

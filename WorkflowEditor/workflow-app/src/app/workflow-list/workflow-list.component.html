@@ -31,8 +31,15 @@
         <td>{{eachWorkflow.update_date | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
         <td>
           <button type="button" class="btn btn-dark btn-outline-light" routerLink="/canvas/{{eachWorkflow.workflow_id}}">open</button>
-          <button type="button" class="btn btn-dark btn-outline-light" (click)="deleteWorkflow(eachWorkflow.workflow_id)">delete</button>
+          <button type="button" class="btn btn-dark btn-outline-light" (click)="workflowToDelete = eachWorkflow; confirmModalOn=true">delete</button>
         </td>
       </tr>
     </tbody>
   </table>
+
+  <!-- modal -->
+  <app-confirm-modal 
+    *ngIf="confirmModalOn" 
+    [bodyText]="'Are you sure to delete this workflow \'' + workflowToDelete.workflow_name + '\'?'"
+    (confirmEvent)="confirmDeleteWorkflow($event)"
+  ></app-confirm-modal>
