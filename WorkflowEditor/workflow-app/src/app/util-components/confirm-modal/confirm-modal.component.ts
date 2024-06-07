@@ -9,7 +9,7 @@ export class ConfirmModalComponent {
   @Input() bodyText?: String;
   @Output() confirmEvent = new EventEmitter<boolean>();
 
-  confirm(choice: boolean) {
+  confirm(choice: boolean): void {
     this.confirmEvent.emit(choice)
   }
 }

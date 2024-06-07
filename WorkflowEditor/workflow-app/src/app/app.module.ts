@@ -22,6 +22,7 @@ import { InMemoryDataService } from './services/in-memory-data.service';
 import 'node_modules/codemirror/mode/python/python.js';
 import { WorkflowListComponent } from './workflow-list/workflow-list.component';
 import { ConfirmModalComponent } from './util-components/confirm-modal/confirm-modal.component';
+import { NoticeModalComponent } from './util-components/notice-modal/notice-modal.component';
 
 
 @NgModule({
@@ -37,7 +38,8 @@ import { ConfirmModalComponent } from './util-components/confirm-modal/confirm-m
     RepeatStepComponent,
     ChatBoxComponent,
     WorkflowListComponent,
-    ConfirmModalComponent
+    ConfirmModalComponent,
+    NoticeModalComponent
   ],
   imports: [
     BrowserModule,

@@ -37,9 +37,16 @@
     </tbody>
   </table>
 
-  <!-- modal -->
+  <!-- confim modal -->
   <app-confirm-modal 
     *ngIf="confirmModalOn" 
     [bodyText]="'Are you sure to delete this workflow \'' + workflowToDelete.workflow_name + '\'?'"
     (confirmEvent)="confirmDeleteWorkflow($event)"
   ></app-confirm-modal>
+
+  <!-- notice modal -->
+  <app-notice-modal
+  *ngIf="noticeModalOn"
+  [bodyText]="noticeModalContent"
+  (closeEvent)="noticeModalOn = false"
+></app-notice-modal>

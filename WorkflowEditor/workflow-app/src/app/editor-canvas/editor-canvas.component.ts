@@ -1,12 +1,5 @@
 import { AfterViewInit, Component, TemplateRef, ViewChild, ChangeDetectionStrategy, ElementRef } from '@angular/core';
 import { NgFlowchart, NgFlowchartStepRegistry, NgFlowchartCanvasDirective } from '@joelwenzel/ng-flowchart';
-/*
-import { CustomStepComponent } from '../custom-step/custom-step.component';
-import { RouteStepComponent } from '../custom-step/route-step/route-step.component';
-import { FormStepComponent } from '../form-step/form-step.component';
-import { ConditionalRedirectStepComponent } from '../script-steps/conditional-redirect-step/conditional-redirect-step.component';
-import { RepeatStepComponent } from '../script-steps/repeat-step/repeat-step.component';
-*/
 import { ActivatedRoute } from '@angular/router';
 import { NestedFlowComponent } from '../nested-flow/nested-flow.component';
 import { ProcessStepComponent } from '../script-steps/process-step/process-step.component';
@@ -14,7 +7,6 @@ import { StepInfo } from '../interfaces/stepInfo'
 import { ExecutionSupportService } from '../services/execution-support.service';
 import { StepEditorCommunicationService } from '../services/step-editor-communication.service';
 import { CustomizationSupportService } from '../services/customization-support.service';
-import { ApplicationRef } from '@angular/core';
 import { WorkflowSupportService } from '../services/workflow-support.service';
 
 @Component({
@@ -63,46 +55,10 @@ export class EditorCanvasComponent implements AfterViewInit {
         icon: 'bi bi-terminal'
       }
   }
-/*
-  conditionalStepOp: StepInfo = {
-    paletteName: 'Conditional Step',
-      step: {
-        template: ProcessStepComponent,
-        type: 'conditional-step',
-        data: {
-          name: 'Conditional Step',
-          prompt: '',
-          pythonCode: '',
-          loopOver: '',
-          focused: false
-        },
-        icon: 'bi bi-list-check'
-      }
-  }
 
-  repetaticeStepOp: StepInfo = {
-    paletteName: 'Repetative Step',
-      step: {
-        template: ProcessStepComponent,
-        type: 'repetative-step',
-        data: {
-          name: 'Repetative Step',
-          prompt: '',
-          pythonCode: '',
-          loopOver: '',
-          focused: false
-        },
-        
-        icon: 'bi bi-repeat'
-      }
-  }
-*/
   customOps = [
     this.processStepOp
-    /*
-    this.conditionalStepOp,
-    this.repetaticeStepOp
-    */
+
   ];
 
   @ViewChild(NgFlowchartCanvasDirective)
@@ -118,13 +74,10 @@ export class EditorCanvasComponent implements AfterViewInit {
   // The choosen processor to delete
   stepToDelete: StepInfo = this.processStepOp;
 
+  noticeModalOn = false;
+  noticeModalContent = '';
+
   ngAfterViewInit() {
-    // this.stepRegistry.registerStep('rest-get', this.normalStepTemplate);
-    //this.stepRegistry.registerStep('log', this.normalStepTemplate);
-    //this.stepRegistry.registerStep('router', CustomStepComponent);
-    //this.stepRegistry.registerStep('nested-flow', NestedFlowComponent);
-    //this.stepRegistry.registerStep('form-step', FormStepComponent);
-    //this.stepRegistry.registerStep('route-step', RouteStepComponent);
     this.stepRegistry.registerStep('process-step', ProcessStepComponent);
     this.loadWorkflow();
     this.loadCustomizedSteps();
@@ -135,7 +88,7 @@ export class EditorCanvasComponent implements AfterViewInit {
     private customizationSupportService: CustomizationSupportService, 
     private eleRef: ElementRef, 
     private stepEditorCommunicationService: StepEditorCommunicationService,
-    private appRef: ApplicationRef,
+ //   private appRef: ApplicationRef,
     private workflowSupportService: WorkflowSupportService,
     private route: ActivatedRoute,
   ) {
@@ -309,6 +262,8 @@ export class EditorCanvasComponent implements AfterViewInit {
       this.workflowSupportService.requestSaveWorkflow(this.workflowID, this.workflowName, this.workflowDescription, this.canvas?.getFlow().toJSON(4), 1)
       .subscribe(response => {
         console.log(response)
+        this.noticeModalContent = "Workflow saved.";
+        this.noticeModalOn = true;
       });
     
     }
@@ -348,20 +303,24 @@ export class EditorCanvasComponent implements AfterViewInit {
 
         
         this.customOps.push(stepInfo);
+        this.noticeModalContent = "Customized step saved.";
+        this.noticeModalOn = true;
       }
-      this.appRef.tick();
+      
     })
   }
   
   deleteCustomizedStep(customizedStepId: number) {
     this.customizationSupportService.requestDeleteStep(customizedStepId).subscribe(response => {
-      console.log(response);
+      this.noticeModalContent = "Customized step deleted.";
+      this.noticeModalOn = true;
       //Refresh the processor list
       this.customOps = [
         this.processStepOp
       ];
       this.loadCustomizedSteps();
-      this.appRef.tick();
+      //this.appRef.tick();
+      
     })
   }
 

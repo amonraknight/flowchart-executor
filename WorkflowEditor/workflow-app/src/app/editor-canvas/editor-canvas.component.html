@@ -16,12 +16,7 @@
       </div>
       
     </section>
-<!--
-    <section>
-      <button (click)="showFlowData()">Show JSON</button>
-      <button (click)="showUpload()">Upload JSON</button>
-    </section>
--->
+
     <section>
       <div class="sub-section">
         <label for="step-gap-select" class="wide">Step Gap</label>
@@ -145,29 +140,17 @@
 
 </main>
 
-<!-- Modal confirm delete -->
-<!--
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="confirmDeleteModalLabel">Please confirm</h1>
-        <i class="bi bi-x-circle-fill close-icon" data-bs-dismiss="modal" aria-label="Close"></i>
-      </div>
-      <div class="modal-body">
-        Are you sure to delete processor {{stepToDelete.step.data.name}}?
-      </div>
-      <div class="modal-footer">
-          <button type="button" class="btn btn-dark" (click)="deleteCustomizedStep(stepToDelete.step.data.id)" data-bs-dismiss="modal">Confirm</button>
-          <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
--->
 
+<!-- Generic modal for confirmarion.-->
 <app-confirm-modal 
   *ngIf="confirmModalOn" 
   [bodyText]="'Are you sure to delete processor \'' + stepToDelete.step.data.name + '\'?'"
   (confirmEvent)="confirmDeleteCustomizedStep($event)"
 ></app-confirm-modal>
+
+<!--Generic modal for notice.-->
+<app-notice-modal
+  *ngIf="noticeModalOn"
+  [bodyText]="noticeModalContent"
+  (closeEvent)="noticeModalOn = false"
+></app-notice-modal>

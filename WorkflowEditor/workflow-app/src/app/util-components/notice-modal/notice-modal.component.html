@@ -1,0 +1,17 @@
+<div class="popup-modal">
+
+    <div class="modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title fs-5" >Notice</h1>
+            <i class="bi bi-x-circle-fill close-icon"  aria-label="Close" (click)="closeModel()"></i>
+        </div>
+        <div class="modal-body">
+            <!-- The text on the body -->
+            {{bodyText}}
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-dark" (click)="closeModel()">OK</button>
+        </div>
+    </div>
+
+</div>

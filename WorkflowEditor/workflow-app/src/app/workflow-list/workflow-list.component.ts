@@ -16,6 +16,9 @@ export class WorkflowListComponent {
   confirmModalOn = false;
   workflowToDelete: any;
 
+  noticeModalOn = false;
+  noticeModalContent = "";
+
   ngAfterViewInit() {
     this.getAllWorkflowInfo();
   }
@@ -44,6 +47,9 @@ workflowDict = {
     this.workflowSupportService.requestDeleteWorkflowByID(workflowID).subscribe(response => {
       console.log(response);
       this.getAllWorkflowInfo();
+      this.noticeModalContent = "Workflow deleted."
+      this.noticeModalOn = true;
+      
     })
   }
 
