@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, TemplateRef, ViewChild, ChangeDetectionStrategy, ElementRef } from '@angular/core';
+import { AfterViewInit, Component, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { NgFlowchart, NgFlowchartStepRegistry, NgFlowchartCanvasDirective } from '@joelwenzel/ng-flowchart';
 import { ActivatedRoute } from '@angular/router';
 import { NestedFlowComponent } from '../nested-flow/nested-flow.component';
@@ -91,6 +91,7 @@ export class EditorCanvasComponent implements AfterViewInit {
  //   private appRef: ApplicationRef,
     private workflowSupportService: WorkflowSupportService,
     private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {
     this.callbacks.onDropError = this.onDropError;
     this.callbacks.onMoveError = this.onMoveError;
@@ -264,8 +265,10 @@ export class EditorCanvasComponent implements AfterViewInit {
         console.log(response)
         this.noticeModalContent = "Workflow saved.";
         this.noticeModalOn = true;
+
+        this.cdr.detectChanges();
       });
-    
+      
     }
   }
 
@@ -289,8 +292,10 @@ export class EditorCanvasComponent implements AfterViewInit {
             }
         }
 
-        this.customOps.push(currentStep)
+        this.customOps.push(currentStep);
       }
+      // Force a render after subscribe.
+      this.cdr.detectChanges();
     })
   }
 
@@ -307,6 +312,7 @@ export class EditorCanvasComponent implements AfterViewInit {
         this.noticeModalOn = true;
       }
       
+      this.cdr.detectChanges();
     })
   }
   
@@ -319,7 +325,6 @@ export class EditorCanvasComponent implements AfterViewInit {
         this.processStepOp
       ];
       this.loadCustomizedSteps();
-      //this.appRef.tick();
       
     })
   }
