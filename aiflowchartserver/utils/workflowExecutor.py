@@ -1,6 +1,8 @@
 import copy
 import types
 import pickle
+import sys
+from io import StringIO
 
 
 class WorkflowExecutor:
@@ -8,44 +10,78 @@ class WorkflowExecutor:
         print('WorkflowExecutor initiated.')
 
     def executeWorkflow(self, inputWorkflowDict, inputExecutionType):
-        message, log = '', ''
+        exeresult = {}
 
         rootStep = inputWorkflowDict['root']
-        try:
-            match inputExecutionType:
-                case 'EXECUTE_ALL':
-                    message, log = self._executeAllSince(rootStep)
-                case 'EXECUTE_STEP':
-                    # to continue
-                    message, log = '', ''
-                case 'EXECUTE_ALL_SINCE':
-                    # to continue
-                    message, log = '', ''
-                case _:
-                    message = 'The execution type "%s" is unknown.' % inputExecutionType
-        except Exception as e:
-            message = str(e)
 
-        return message, log
+        match inputExecutionType:
+            case 'EXECUTE_ALL':
+                exeresult, treeHasException = self._executeAllSince(rootStep)
+            case 'EXECUTE_STEP':
+                # to continue
+                exeresult = {}
+                treeHasException = 0
+            case 'EXECUTE_ALL_SINCE':
+                # to continue
+                exeresult = {}
+                treeHasException = 0
+            case _:
+                exeresult = {
+                    'error': 'The execution type "%s" is unknown.' % inputExecutionType
+                }
+                treeHasException = 0
+
+        return exeresult, treeHasException
 
     def _executeAllSince(self, inputWorkflowDict, globalVar={}, localVar={}):
-        message, log = '', ''
+
+        thisStepException = 0
+        treeHasException = 0
+
         stepId = inputWorkflowDict['id']
         scriptStr = inputWorkflowDict['data']['pythonCode']
         print('Step ID: %s \nScript: %s ' % (stepId, scriptStr))
-        exec(scriptStr, globalVar, localVar)
+
+        # Redirect the log.
+        backup_stdout = sys.stdout
+        sys.stdout = StringIO()
+        try:
+            exec(scriptStr, globalVar, localVar)
+            error = ''
+        except Exception as e:
+            error = str(e)
+            thisStepException = 1
+
+        log = sys.stdout.getvalue()
+        sys.stdout = backup_stdout
+
+        exeResult = {
+            'stepId': stepId,
+            'log': log,
+            'error': error,
+            'encounterException': thisStepException
+        }
 
         # all children:
         children = inputWorkflowDict['children']
-        if children and len(children) > 0:
+
+        # Stop if has exception or has no children.
+        if thisStepException == 0 and children and len(children) > 0:
+            childrenExeResultList = []
             for eachChild in children:
                 childGlobalVar = self._copyEnvVariables(globalVar)
                 # Inherit all the modules, copy others.
                 childLocalVar = self._copyEnvVariables(localVar)
                 # print(pickle.dumps(childGlobalVar))
-                self._executeAllSince(eachChild, childGlobalVar, childLocalVar)
+                childExeResult, childHasException = self._executeAllSince(eachChild, childGlobalVar, childLocalVar)
+                if childHasException == 1:
+                    treeHasException = 1
+                childrenExeResultList.append(childExeResult)
+            exeResult['children'] = childrenExeResultList
+        else:
+            treeHasException = 1
 
-        return message, log
+        return exeResult, treeHasException
 
     def _copyEnvVariables(self, lovalVar):
         copiedVars = {}

@@ -34,12 +34,14 @@ def executeScript(request):
 		workflowDict = json.loads(requestToExecution.flow)
 #		print(workflowDict)
 		workflowExecutor = WorkflowExecutor()
-		message, log = workflowExecutor.executeWorkflow(workflowDict, requestToExecution.executionType)
-		data = {
-		  'log': log
-		}
+		exeResult, treeHasException = workflowExecutor.executeWorkflow(workflowDict, requestToExecution.executionType)
 
-		response = GeneralResponseBody(message=message, data=data)
+		if treeHasException == 1:
+			message = "Encountered an exception!"
+		else:
+			message = "All scripts have executed successfully."
+
+		response = GeneralResponseBody(message=message, data=exeResult)
 		
 		return JsonResponse(response.getResponseBody())
 	else:
