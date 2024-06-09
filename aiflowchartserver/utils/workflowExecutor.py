@@ -10,28 +10,28 @@ class WorkflowExecutor:
         print('WorkflowExecutor initiated.')
 
     def executeWorkflow(self, inputWorkflowDict, inputExecutionType):
-        exeresult = {}
+        exeResult = {}
 
         rootStep = inputWorkflowDict['root']
 
         match inputExecutionType:
             case 'EXECUTE_ALL':
-                exeresult, treeHasException = self._executeAllSince(rootStep)
+                exeResult, treeHasException = self._executeAllSince(rootStep)
             case 'EXECUTE_STEP':
                 # to continue
-                exeresult = {}
+                exeResult = {}
                 treeHasException = 0
             case 'EXECUTE_ALL_SINCE':
                 # to continue
-                exeresult = {}
+                exeResult = {}
                 treeHasException = 0
             case _:
-                exeresult = {
+                exeResult = {
                     'error': 'The execution type "%s" is unknown.' % inputExecutionType
                 }
                 treeHasException = 0
 
-        return exeresult, treeHasException
+        return exeResult, treeHasException
 
     def _executeAllSince(self, inputWorkflowDict, globalVar={}, localVar={}):
 
@@ -78,8 +78,9 @@ class WorkflowExecutor:
                     treeHasException = 1
                 childrenExeResultList.append(childExeResult)
             exeResult['children'] = childrenExeResultList
+
         else:
-            treeHasException = 1
+            treeHasException = thisStepException
 
         return exeResult, treeHasException
 
