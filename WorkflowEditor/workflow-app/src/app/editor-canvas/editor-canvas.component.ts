@@ -35,8 +35,8 @@ export class EditorCanvasComponent implements AfterViewInit {
   @ViewChild('normalStep')
   normalStepTemplate!: TemplateRef<any>;
 
-  //sampleJson = '{"root":{"id":"s1674421266194","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[{"id":"s1674421267975","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[{"id":"s1674421269738","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[]}]},{"id":"s1674421268826","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[]}]},"connectors":[{"startStepId":"s1674421269738","endStepId":"s1674421268826"}]}';
-  sampleJson = '{"root": {"id": "s1715319429481","type": "process-step","data": {"name": "Read CSV file","prompt": "","pythonCode": "\\n\\nimport pandas as pd\\n\\n# Define the path to your CSV file\\nfile_path = r\\"E:\\\\testfield\\\\python\\\\iristest\\\\data\\\\iris.csv\\"  # Replace \'your_file.csv\' with the actual file name\\n\\n# Read the CSV file into a Pandas DataFrame\\ndf = pd.read_csv(file_path)\\n\\n# Display the DataFrame to verify the content\\nprint(df)\\n","loopOver": "", "focused": false, "id": 26 }, "children": [ { "id": "s1717202813288", "type": "process-step", "data": { "name": "Count df rows", "prompt": "", "pythonCode": "\\n# Using the shape attribute\\nnum_rows_shape = df.shape[0]\\nprint(f\\"Number of rows using shape: {num_rows_shape}\\")\\n\\n# Using the len() method\\nnum_rows_len = len(df)\\nprint(f\\"Number of rows using len: {num_rows_len}\\")\\n","loopOver": "","focused": true,"id": 27},"children": []}]},"connectors": []}'
+  // sampleJson = '{"root":{"id":"s1674421266194","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[{"id":"s1674421267975","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[{"id":"s1674421269738","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[]}]},{"id":"s1674421268826","type":"log","data":{"name":"Log","icon":{"name":"log-icon","color":"blue"},"config":{"message":null,"severity":null}},"children":[]}]},"connectors":[{"startStepId":"s1674421269738","endStepId":"s1674421268826"}]}';
+  // sampleJson = '{"root": {"id": "s1715319429481","type": "process-step","data": {"name": "Read CSV file","prompt": "","pythonCode": "\\n\\nimport pandas as pd\\n\\n# Define the path to your CSV file\\nfile_path = r\\"E:\\\\testfield\\\\python\\\\iristest\\\\data\\\\iris.csv\\"  # Replace \'your_file.csv\' with the actual file name\\n\\n# Read the CSV file into a Pandas DataFrame\\ndf = pd.read_csv(file_path)\\n\\n# Display the DataFrame to verify the content\\nprint(df)\\n","loopOver": "", "focused": false, "id": 26 }, "children": [ { "id": "s1717202813288", "type": "process-step", "data": { "name": "Count df rows", "prompt": "", "pythonCode": "\\n# Using the shape attribute\\nnum_rows_shape = df.shape[0]\\nprint(f\\"Number of rows using shape: {num_rows_shape}\\")\\n\\n# Using the len() method\\nnum_rows_len = len(df)\\nprint(f\\"Number of rows using len: {num_rows_len}\\")\\n","loopOver": "","focused": true,"id": 27},"children": []}]},"connectors": []}'
   defaultJson = '{"connectors": []}'
   
   processStepOp: StepInfo = {
@@ -48,9 +48,11 @@ export class EditorCanvasComponent implements AfterViewInit {
           name: 'Process Step',
           prompt: '',
           pythonCode: '',
-          loopOver: '',
           focused: false,
-          id: 0
+          id: 0,
+          log: '',
+          error: '',
+          hasError: -1
         },
         icon: 'bi bi-terminal'
       }
@@ -224,8 +226,13 @@ export class EditorCanvasComponent implements AfterViewInit {
   executeAll():void {
     if(this.canvas) {
       //EXECUTE_ALL, EXECUTE_STEP, EXECUTE_ALL_SINCE
-      this.executionSupportService.requestExection('EXECUTE_ALL', this.canvas?.getFlow().toJSON(4)).subscribe(data => {
-        console.log(data)
+      this.executionSupportService.requestExection('EXECUTE_ALL', this.canvas?.getFlow().toJSON(4)).subscribe(response => {
+        console.log(response);
+        
+        // Load workflow
+        this.canvas?.getFlow().upload(response.data);
+        //Render
+        this.cdr.detectChanges();
       });
     }
   }
@@ -284,9 +291,11 @@ export class EditorCanvasComponent implements AfterViewInit {
                 name: eachProcessor.name,
                 prompt: eachProcessor.prompt,
                 pythonCode: eachProcessor.pythonCode,
-                loopOver: eachProcessor.loopOver,
                 focused: false,
-                id: eachProcessor.id
+                id: eachProcessor.id,
+                log: '',
+                error: '',
+                hasError: -1
               },
               icon: 'bi bi-terminal'
             }

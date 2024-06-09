@@ -1,7 +1,10 @@
-<div [class]="data.focused ?  stepClassFocused:stepClassNoFocus" #canvasContent (click)="setFocus()">
+<div [class]="getStepClass(data)" #canvasContent (click)="setFocus()">
     <i class="bi bi-terminal" width="16" height="16" fill="currentColor"></i>
     <span>{{ data.name }}</span>
-    <!--<i class="bi bi-x-circle-fill close-icon" (click)="delete()"></i>-->
+
+    <!--The execution status.-->
+    <i class="bi bi-bookmark-check-fill exe-status-icon" *ngIf="data.hasError==0" (click)="showLog=true"></i>
+    <i class="bi bi-bookmark-x-fill exe-status-icon" *ngIf="data.hasError==1" (click)="showLog=true"></i>
 
     <div class="btn-group step-btns" role="group" aria-label="Basic outlined example">
         <button type="button" class="btn btn-outline-light" (click)="openModal()">Open Detail</button>
@@ -29,6 +32,21 @@
         </div>
     <div class="modal-chat" *ngIf="showChat">
         <app-chat-box [predecessorSteps]="getPredecessorScripts(3)" (renewScriptEvent)="renewScript($event)"></app-chat-box>
+    </div>
+</div>
+
+<div *ngIf="showLog" class = "popup-modal">
+    <div class="modal-content">
+        <i class="bi bi-x-circle-fill close-icon" (click)="showLog=false"></i>
+        
+        <div class="mb-3">
+            <label class="form-label">Log</label>            
+            <textarea class="form-control log-text" [(ngModel)]="data.log" readonly></textarea>
+
+            <label class="form-label">Error</label>            
+            <textarea class="form-control log-text" [(ngModel)]="data.error" readonly></textarea>
+        </div>
+        
     </div>
 </div>
 

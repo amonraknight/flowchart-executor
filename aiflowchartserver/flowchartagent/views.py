@@ -38,10 +38,13 @@ def executeScript(request):
 
 		if treeHasException == 1:
 			message = "Encountered an exception!"
+			# Script exception
+			status = 2
 		else:
 			message = "All scripts have executed successfully."
+			status = 1
 
-		response = GeneralResponseBody(message=message, data=exeResult)
+		response = GeneralResponseBody(message=message, status=status, data=exeResult)
 		
 		return JsonResponse(response.getResponseBody())
 	else:

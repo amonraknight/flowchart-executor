@@ -7,9 +7,11 @@ export interface StepInfo {
           name: string,
           prompt: string,
           pythonCode: string,
-          loopOver: string,
           focused: boolean,
-          id: number
+          id: number,
+          log: string,
+          error: string,
+          hasError: number
         },
         icon: string
     }

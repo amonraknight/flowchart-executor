@@ -14,10 +14,7 @@ export class ProcessStepComponent extends NgFlowchartStepComponent implements On
 
   showModal = false;
   showChat = false;
-  stepClass = "process-step";
-  stepClassNoFocus = "process-step";
-  stepClassFocused = "process-step-focused";
-
+  showLog = false;
 
   constructor(private stepEditorCommunicationService: StepEditorCommunicationService) {
     super();
@@ -115,6 +112,25 @@ export class ProcessStepComponent extends NgFlowchartStepComponent implements On
     }
 
     this.stepEditorCommunicationService.addCustomizedStep(thisStepInfo);
+  }
+
+  getStepClass(data: any): string {
+    let classStr = "process-step";
+    if(data.hasError == 0) {
+      classStr = classStr + " success";
+    }
+    else if(data.hasError == 1) {
+      classStr = classStr + " exception";
+    }
+    else {
+      classStr = classStr + " before-run";
+    }
+
+    if(data.focused) {
+      classStr = classStr + " focused"
+    }
+
+    return classStr;
   }
 
 }
