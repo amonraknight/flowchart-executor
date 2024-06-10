@@ -4,6 +4,8 @@ import pickle
 import sys
 from io import StringIO
 
+from utils.importextracter import getImportScript
+
 
 class WorkflowExecutor:
     def __init__(self):
@@ -43,6 +45,13 @@ class WorkflowExecutor:
         backup_stdout = sys.stdout
         sys.stdout = StringIO()
         try:
+            libLocalVar = {}
+
+            # Prepare the import of libraries, get put the lib to global var.
+            libImportScript = getImportScript(scriptStr)
+            exec(libImportScript, {}, libLocalVar)
+            globalVar.update(libLocalVar)
+
             exec(scriptStr, globalVar, localVar)
             error = ''
         except Exception as e:
@@ -84,6 +93,6 @@ class WorkflowExecutor:
         for key, value in lovalVar.items():
             if isinstance(value, types.ModuleType):
                 copiedVars[key] = value
-        else:
-            copiedVars[key] = copy.deepcopy(value)
+            else:
+                copiedVars[key] = copy.deepcopy(value)
         return copiedVars
