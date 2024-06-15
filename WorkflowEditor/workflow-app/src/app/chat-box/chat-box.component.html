@@ -1,8 +1,0 @@
-<div class="chat-container">
-    <div class="message-container">
-      <!--<div class="message" *ngFor="let msg of messages">{{ msg.message }}</div> -->
-      <div [class]="msg.role=='user' ?  'message user-message':'message assistant-message'" *ngFor="let msg of messages">{{ msg.content }}</div>
-    </div>
-    <input class="input" type="text" [(ngModel)]="userInput" placeholder="Type your message...">
-    <button class="btn btn-dark" (click)="sendMessage()">Send</button>
-  </div>

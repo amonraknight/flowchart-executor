@@ -15,7 +15,6 @@ import { ProcessStepComponent } from './script-steps/process-step/process-step.c
 import { ConditionalRedirectStepComponent } from './script-steps/conditional-redirect-step/conditional-redirect-step.component';
 import { RepeatStepComponent } from './script-steps/repeat-step/repeat-step.component';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
-import { ChatBoxComponent } from './chat-box/chat-box.component';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { InMemoryDataService } from './services/in-memory-data.service';
 
@@ -23,6 +22,7 @@ import 'node_modules/codemirror/mode/python/python.js';
 import { WorkflowListComponent } from './workflow-list/workflow-list.component';
 import { ConfirmModalComponent } from './util-components/confirm-modal/confirm-modal.component';
 import { NoticeModalComponent } from './util-components/notice-modal/notice-modal.component';
+import { ScriptEditorComponent } from './script-steps/script-editor/script-editor.component';
 
 
 @NgModule({
@@ -36,10 +36,10 @@ import { NoticeModalComponent } from './util-components/notice-modal/notice-moda
     ProcessStepComponent,
     ConditionalRedirectStepComponent,
     RepeatStepComponent,
-    ChatBoxComponent,
     WorkflowListComponent,
     ConfirmModalComponent,
-    NoticeModalComponent
+    NoticeModalComponent,
+    ScriptEditorComponent
   ],
   imports: [
     BrowserModule,
