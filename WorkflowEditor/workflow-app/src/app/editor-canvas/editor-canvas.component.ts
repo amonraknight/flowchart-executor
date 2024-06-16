@@ -86,7 +86,6 @@ export class EditorCanvasComponent implements AfterViewInit {
     this.subWorkflowStepOp
   ];
   customOps: StepInfo[] = [];
-  totalOps: StepInfo[] = [];
 
   @ViewChild(NgFlowchartCanvasDirective)
   canvas: NgFlowchartCanvasDirective | undefined;
@@ -331,8 +330,6 @@ export class EditorCanvasComponent implements AfterViewInit {
 
         this.customOps.push(currentStep);
       }
-
-      this.totalOps = this.nativeOps.concat(this.customOps);
       // Force a render after subscribe.
       this.cdr.detectChanges();
     })
@@ -346,7 +343,6 @@ export class EditorCanvasComponent implements AfterViewInit {
         stepInfo.step.data.id = response.data.processorID;
 
         this.customOps.push(stepInfo);
-        this.totalOps.push(stepInfo);
         this.noticeModalContent = "Customized step saved.";
         this.noticeModalOn = true;
       }

@@ -1,20 +1,33 @@
 <main>
   <!--The palette-->
   <div id="palette" class="d-flex flex-column text-bg-dark">
-    <span class="fs-4" *ngIf="!workflowNameInEdit" (click)="editWorkflowName()">{{workflowName}}</span>
-    <input id="workflowNameInput"  type="text" *ngIf="workflowNameInEdit" [(ngModel)]="workflowName" (blur)="editWorkflowName()" />
-    <hr>
     <section>
+      <span class="fs-4" *ngIf="!workflowNameInEdit" (click)="editWorkflowName()">{{workflowName}}</span>
+      <input id="workflowNameInput"  type="text" *ngIf="workflowNameInEdit" [(ngModel)]="workflowName" (blur)="editWorkflowName()" />
+    </section>
+
+    <section>
+      <label class="wide">Native Steps</label>
       <div
         class="plugin-op"
-        *ngFor="let op of totalOps"
+        *ngFor="let op of nativeOps"
+        [ngFlowchartStep]="op.step">
+        <i [class]="op.step.icon" width="16" height="16" fill="currentColor"></i>
+        <span>{{ op.paletteName }}</span>
+      </div>
+    </section>
+
+    <section>
+      <label class="wide">Customized Steps</label>
+      <div
+        class="plugin-op"
+        *ngFor="let op of customOps"
         [ngFlowchartStep]="op.step">
         <i [class]="op.step.icon" width="16" height="16" fill="currentColor"></i>
         <span>{{ op.paletteName }}</span>
         <!-- <i class="bi bi-x-circle-fill close-icon" *ngIf="op.step.data.id>0" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" (click)="stepToDelete=op"></i> -->
         <i class="bi bi-x-circle-fill close-icon" *ngIf="op.step.data.id>0" (click)="stepToDelete=op; confirmModalOnDeleteStep = true;"></i>
       </div>
-      
     </section>
 
     <section>
