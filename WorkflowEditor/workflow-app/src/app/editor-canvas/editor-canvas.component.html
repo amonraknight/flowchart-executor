@@ -7,7 +7,7 @@
     <section>
       <div
         class="plugin-op"
-        *ngFor="let op of customOps"
+        *ngFor="let op of totalOps"
         [ngFlowchartStep]="op.step">
         <i [class]="op.step.icon" width="16" height="16" fill="currentColor"></i>
         <span>{{ op.paletteName }}</span>

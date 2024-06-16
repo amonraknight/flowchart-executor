@@ -1,0 +1,13 @@
+<div [class]="getStepClass(data)" #canvasContent (click)="setFocus()">
+    <i class="bi bi-share" width="16" height="16" fill="currentColor"></i>
+    <span>{{ data.name }}</span>
+
+    <!--The execution status.-->
+    <i class="bi bi-bookmark-check-fill exe-status-icon" *ngIf="data.hasError==0" (click)="showLog=true"></i>
+    <i class="bi bi-bookmark-x-fill exe-status-icon" *ngIf="data.hasError==1" (click)="showLog=true"></i>
+
+    <div class="btn-group step-btns" role="group" aria-label="Basic outlined example">
+        <button type="button" class="btn btn-outline-light" (click)="openModal()">Open Detail</button>
+        <button type="button" class="btn btn-outline-light" (click)="delete()">Delete</button>
+      </div>
+</div>

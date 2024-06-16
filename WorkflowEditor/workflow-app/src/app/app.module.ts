@@ -12,8 +12,6 @@ import { FormStepComponent } from './form-step/form-step.component';
 import { NestedFlowComponent } from './nested-flow/nested-flow.component';
 import { RouteStepComponent } from './custom-step/route-step/route-step.component';
 import { ProcessStepComponent } from './script-steps/process-step/process-step.component';
-import { ConditionalRedirectStepComponent } from './script-steps/conditional-redirect-step/conditional-redirect-step.component';
-import { RepeatStepComponent } from './script-steps/repeat-step/repeat-step.component';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { InMemoryDataService } from './services/in-memory-data.service';
@@ -23,6 +21,7 @@ import { WorkflowListComponent } from './workflow-list/workflow-list.component';
 import { ConfirmModalComponent } from './util-components/confirm-modal/confirm-modal.component';
 import { NoticeModalComponent } from './util-components/notice-modal/notice-modal.component';
 import { ScriptEditorComponent } from './script-steps/script-editor/script-editor.component';
+import { SubworkflowStepComponent } from './script-steps/subworkflow-step/subworkflow-step.component';
 
 
 @NgModule({
@@ -34,12 +33,11 @@ import { ScriptEditorComponent } from './script-steps/script-editor/script-edito
     NestedFlowComponent,
     RouteStepComponent,
     ProcessStepComponent,
-    ConditionalRedirectStepComponent,
-    RepeatStepComponent,
     WorkflowListComponent,
     ConfirmModalComponent,
     NoticeModalComponent,
-    ScriptEditorComponent
+    ScriptEditorComponent,
+    SubworkflowStepComponent
   ],
   imports: [
     BrowserModule,

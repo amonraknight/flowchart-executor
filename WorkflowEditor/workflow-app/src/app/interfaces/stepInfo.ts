@@ -7,6 +7,7 @@ export interface StepInfo {
           name: string,
           prompt: string,
           pythonCode: string,
+          subworkflowId: number,
           focused: boolean,
           id: number,
           log: string,

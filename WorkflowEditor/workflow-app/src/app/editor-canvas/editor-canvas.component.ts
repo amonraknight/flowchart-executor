@@ -3,6 +3,7 @@ import { NgFlowchart, NgFlowchartStepRegistry, NgFlowchartCanvasDirective } from
 import { ActivatedRoute } from '@angular/router';
 import { NestedFlowComponent } from '../nested-flow/nested-flow.component';
 import { ProcessStepComponent } from '../script-steps/process-step/process-step.component';
+import { SubworkflowStepComponent } from '../script-steps/subworkflow-step/subworkflow-step.component';
 import { StepInfo } from '../interfaces/stepInfo'
 import { ExecutionSupportService } from '../services/execution-support.service';
 import { StepEditorCommunicationService } from '../services/step-editor-communication.service';
@@ -48,6 +49,7 @@ export class EditorCanvasComponent implements AfterViewInit {
           name: 'Process Step',
           prompt: '',
           pythonCode: '',
+          subworkflowId: -1,
           focused: false,
           id: 0,
           log: '',
@@ -58,10 +60,33 @@ export class EditorCanvasComponent implements AfterViewInit {
       }
   }
 
-  customOps = [
-    this.processStepOp
+  subWorkflowStepOp: StepInfo = {
+    paletteName: 'Subworkflow Step',
+      step: {
+        template: SubworkflowStepComponent,
+        type: 'subworkflow-step',
+        data: {
+          name: 'Subworkflow Step',
+          prompt: '',
+          pythonCode: '',
+          subworkflowId: -1,
+          focused: false,
+          id: 0,
+          log: '',
+          error: '',
+          hasError: -1
+        },
+        icon: 'bi bi-share'
+      }
+  }
 
+  // The step lists.
+  nativeOps: StepInfo[] = [
+    this.processStepOp,
+    this.subWorkflowStepOp
   ];
+  customOps: StepInfo[] = [];
+  totalOps: StepInfo[] = [];
 
   @ViewChild(NgFlowchartCanvasDirective)
   canvas: NgFlowchartCanvasDirective | undefined;
@@ -112,6 +137,7 @@ export class EditorCanvasComponent implements AfterViewInit {
       }
     )
   }
+
 
   onDropError(error: NgFlowchart.DropError): void {
     console.log(error);
@@ -287,11 +313,12 @@ export class EditorCanvasComponent implements AfterViewInit {
           paletteName: eachProcessor.name,
             step: {
               template: ProcessStepComponent,
-              type: 'process-step',
+              type: eachProcessor.type ?? 'process-step',
               data: {
                 name: eachProcessor.name,
-                prompt: eachProcessor.prompt,
-                pythonCode: eachProcessor.pythonCode,
+                prompt: eachProcessor.prompt ?? '',
+                pythonCode: eachProcessor.pythonCode ?? '',
+                subworkflowId: eachProcessor.subworkflowId ?? -1,
                 focused: false,
                 id: eachProcessor.id,
                 log: '',
@@ -304,6 +331,8 @@ export class EditorCanvasComponent implements AfterViewInit {
 
         this.customOps.push(currentStep);
       }
+
+      this.totalOps = this.nativeOps.concat(this.customOps);
       // Force a render after subscribe.
       this.cdr.detectChanges();
     })
@@ -316,8 +345,8 @@ export class EditorCanvasComponent implements AfterViewInit {
       if(response.data.processorID) {
         stepInfo.step.data.id = response.data.processorID;
 
-        
         this.customOps.push(stepInfo);
+        this.totalOps.push(stepInfo);
         this.noticeModalContent = "Customized step saved.";
         this.noticeModalOn = true;
       }
@@ -331,9 +360,7 @@ export class EditorCanvasComponent implements AfterViewInit {
       this.noticeModalContent = "Customized step deleted.";
       this.noticeModalOn = true;
       //Refresh the processor list
-      this.customOps = [
-        this.processStepOp
-      ];
+      this.customOps = [];
       this.loadCustomizedSteps();
       
     })

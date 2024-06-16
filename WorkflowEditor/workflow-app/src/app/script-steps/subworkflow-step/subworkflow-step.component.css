@@ -1,0 +1,33 @@
+.process-step {
+    height: 100px;
+    width: 250px;
+    border-radius: 4px;
+    padding: 1em;
+    display: block;
+  
+    justify-content: space-between;
+}
+
+.before-run {
+    background: #605e5e;
+    color: white;
+}
+
+.focused {
+    border: 5px solid rgb(0, 0, 0);
+}
+
+.success {
+  background: #05ae0e;
+  color: rgb(0, 0, 0);
+}
+
+.exe-status-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.bi {
+    padding: 5px;
+}
