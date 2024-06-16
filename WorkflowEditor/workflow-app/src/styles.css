@@ -1,1 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+
+/*This overwrites the scc of ngx-codemirror.*/
+.CodeMirror {
+    font-family: monospace;
+    height: auto;
+    min-height: 500px;
+    color: black;
+    direction: ltr;
+  }

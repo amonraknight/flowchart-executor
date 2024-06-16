@@ -72,7 +72,8 @@ export class EditorCanvasComponent implements AfterViewInit {
   workflowName = 'My Workflow';
   workflowDescription = 'This is the description.';
   // The flag controlling the visibility of the confirm modal.
-  confirmModalOn = false;
+  confirmModalOnDeleteStep = false;
+  confirmModalOnClearCanvas = false;
   // The choosen processor to delete
   stepToDelete: StepInfo = this.processStepOp;
 
@@ -346,7 +347,18 @@ export class EditorCanvasComponent implements AfterViewInit {
       
     }
    
-    this.confirmModalOn = false;
+    this.confirmModalOnDeleteStep = false;
+    
+  }
+
+  confirmClearFlow(choice: boolean) {
+    if (choice) {
+      // Confirm to delete.
+      this.clearData();
+      
+    }
+   
+    this.confirmModalOnClearCanvas = false;
     
   }
 }

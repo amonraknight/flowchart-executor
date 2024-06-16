@@ -48,7 +48,7 @@ default-character-set = utf8
 
 2. To activate AI programing, add your Zhipu API key to "\flowchart-executor\aiflowchartserver\zhipuvisit\apikey.txt".
 
-# Data model migration
+### Data model migration
 
 Execute "python manage.py migrate" at "\flowchart-executor\aiflowchartserver" to migrate the models to DB. 
 
@@ -68,6 +68,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 The flowchart is applying [ng-flowchart](https://github.com/joel-wenzel/ng-flowchart). 
 
 The frontend depends on [Bootstrap](https://v5.bootcss.com/docs/getting-started/introduction/) v5.
+
+The code editing area is [ngx-codemirror](https://github.com/scttcper/ngx-codemirror).
 
 ### Development server
 
