@@ -9,5 +9,10 @@
     <div class="btn-group step-btns" role="group" aria-label="Basic outlined example">
         <button type="button" class="btn btn-outline-light" (click)="openModal()">Open Detail</button>
         <button type="button" class="btn btn-outline-light" (click)="delete()">Delete</button>
-      </div>
+    </div>
 </div>
+
+<app-subworkflow-selector *ngIf="showModal"
+  [data]="data"
+  (closeEvent)="showModal = false"
+></app-subworkflow-selector>

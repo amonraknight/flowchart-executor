@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { CommonRequestService } from './common-request.service';
 import { environment } from 'src/environments/environment';
 import { catchError, tap } from 'rxjs/operators';
-import { StepInfo } from '../interfaces/stepInfo';
+import { StepInfo } from '../interfaces/step-info/stepInfo';
 import { ResponseFromBack } from '../interfaces/responseFromBack';
 
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { StepInfo } from '../interfaces/stepInfo';
+import { StepInfo } from '../interfaces/step-info/stepInfo';
 import { Subject } from 'rxjs';
 
 @Injectable({

@@ -22,6 +22,7 @@ import { ConfirmModalComponent } from './util-components/confirm-modal/confirm-m
 import { NoticeModalComponent } from './util-components/notice-modal/notice-modal.component';
 import { ScriptEditorComponent } from './script-steps/script-editor/script-editor.component';
 import { SubworkflowStepComponent } from './script-steps/subworkflow-step/subworkflow-step.component';
+import { SubworkflowSelectorComponent } from './script-steps/subworkflow-selector/subworkflow-selector.component';
 
 
 @NgModule({
@@ -37,7 +38,8 @@ import { SubworkflowStepComponent } from './script-steps/subworkflow-step/subwor
     ConfirmModalComponent,
     NoticeModalComponent,
     ScriptEditorComponent,
-    SubworkflowStepComponent
+    SubworkflowStepComponent,
+    SubworkflowSelectorComponent
   ],
   imports: [
     BrowserModule,

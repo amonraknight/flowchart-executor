@@ -10,7 +10,6 @@ import { StepEditorCommunicationService } from 'src/app/services/step-editor-com
 })
 export class SubworkflowStepComponent extends NgFlowchartStepComponent implements OnInit{
 
-  
   showModal = false;
   showLog = false;
 
@@ -27,6 +26,18 @@ export class SubworkflowStepComponent extends NgFlowchartStepComponent implement
   override canDrop(dropEvent: NgFlowchart.DropTarget): boolean {
     return true;
   }
+
+  
+
+  openModal(): void {
+    this.showModal = true
+  }
+
+  closeModal(): void {
+    this.showModal = false
+    //console.log(this.parent)
+  }
+
 
   delete(): void {
     //recursively delete
@@ -63,14 +74,7 @@ export class SubworkflowStepComponent extends NgFlowchartStepComponent implement
     }
   }
 
-  openModal(): void {
-    this.showModal = true
-  }
 
-  closeModal(): void {
-    this.showModal = false
-    //console.log(this.parent)
-  }
   
   getStepClass(data: any): string {
     let classStr = "process-step";

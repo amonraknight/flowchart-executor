@@ -12,7 +12,7 @@ export class WorkflowListComponent {
 
   }
 
-  workflows: any = [];
+  workflows: any[] = [];
   confirmModalOn = false;
   workflowToDelete: any;
 

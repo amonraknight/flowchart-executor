@@ -4,11 +4,14 @@ import { ActivatedRoute } from '@angular/router';
 import { NestedFlowComponent } from '../nested-flow/nested-flow.component';
 import { ProcessStepComponent } from '../script-steps/process-step/process-step.component';
 import { SubworkflowStepComponent } from '../script-steps/subworkflow-step/subworkflow-step.component';
-import { StepInfo } from '../interfaces/stepInfo'
+import { StepInfo } from '../interfaces/step-info/stepInfo'
 import { ExecutionSupportService } from '../services/execution-support.service';
 import { StepEditorCommunicationService } from '../services/step-editor-communication.service';
 import { CustomizationSupportService } from '../services/customization-support.service';
 import { WorkflowSupportService } from '../services/workflow-support.service';
+import { ProcessorStepData } from '../interfaces/step-info/processorStepData';
+import { SubworkflowStepData } from '../interfaces/step-info/subsworkflowStepData';
+import { StepInfoData } from '../interfaces/step-info/stepInfoData';
 
 @Component({
   selector: 'app-editor-canvas',
@@ -40,24 +43,37 @@ export class EditorCanvasComponent implements AfterViewInit {
   // sampleJson = '{"root": {"id": "s1715319429481","type": "process-step","data": {"name": "Read CSV file","prompt": "","pythonCode": "\\n\\nimport pandas as pd\\n\\n# Define the path to your CSV file\\nfile_path = r\\"E:\\\\testfield\\\\python\\\\iristest\\\\data\\\\iris.csv\\"  # Replace \'your_file.csv\' with the actual file name\\n\\n# Read the CSV file into a Pandas DataFrame\\ndf = pd.read_csv(file_path)\\n\\n# Display the DataFrame to verify the content\\nprint(df)\\n","loopOver": "", "focused": false, "id": 26 }, "children": [ { "id": "s1717202813288", "type": "process-step", "data": { "name": "Count df rows", "prompt": "", "pythonCode": "\\n# Using the shape attribute\\nnum_rows_shape = df.shape[0]\\nprint(f\\"Number of rows using shape: {num_rows_shape}\\")\\n\\n# Using the len() method\\nnum_rows_len = len(df)\\nprint(f\\"Number of rows using len: {num_rows_len}\\")\\n","loopOver": "","focused": true,"id": 27},"children": []}]},"connectors": []}'
   defaultJson = '{"connectors": []}'
   
+  processStepData: ProcessorStepData = {
+    name: 'Process Step',
+    prompt: '',
+    pythonCode: '',
+    focused: false,
+    id: 0,
+    log: '',
+    error: '',
+    hasError: -1
+  }
+
   processStepOp: StepInfo = {
     paletteName: 'Process Step',
       step: {
         template: ProcessStepComponent,
         type: 'process-step',
-        data: {
-          name: 'Process Step',
-          prompt: '',
-          pythonCode: '',
-          subworkflowId: -1,
-          focused: false,
-          id: 0,
-          log: '',
-          error: '',
-          hasError: -1
-        },
+        data: this.processStepData,
         icon: 'bi bi-terminal'
       }
+  }
+
+  subWorkflowStepData: SubworkflowStepData = {
+    name: 'Subworkflow Step',
+    subworkflowId: -1,
+    subWorkflowName: 'select a workflow...',
+    focused: false,
+    id: 0,
+    log: '',
+    error: '',
+    hasError: -1,
+    
   }
 
   subWorkflowStepOp: StepInfo = {
@@ -65,17 +81,7 @@ export class EditorCanvasComponent implements AfterViewInit {
       step: {
         template: SubworkflowStepComponent,
         type: 'subworkflow-step',
-        data: {
-          name: 'Subworkflow Step',
-          prompt: '',
-          pythonCode: '',
-          subworkflowId: -1,
-          focused: false,
-          id: 0,
-          log: '',
-          error: '',
-          hasError: -1
-        },
+        data: this.subWorkflowStepData,
         icon: 'bi bi-share'
       }
   }
@@ -106,6 +112,7 @@ export class EditorCanvasComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.stepRegistry.registerStep('process-step', ProcessStepComponent);
+    this.stepRegistry.registerStep('subworkflow-step', SubworkflowStepComponent);
     this.loadWorkflow();
     this.loadCustomizedSteps();
   }
@@ -115,7 +122,7 @@ export class EditorCanvasComponent implements AfterViewInit {
     private customizationSupportService: CustomizationSupportService, 
     private eleRef: ElementRef, 
     private stepEditorCommunicationService: StepEditorCommunicationService,
- //   private appRef: ApplicationRef,
+//   private appRef: ApplicationRef,
     private workflowSupportService: WorkflowSupportService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
@@ -295,7 +302,7 @@ export class EditorCanvasComponent implements AfterViewInit {
     if(this.canvas) {
       this.workflowSupportService.requestSaveWorkflow(this.workflowID, this.workflowName, this.workflowDescription, this.canvas?.getFlow().toJSON(4), 1)
       .subscribe(response => {
-        console.log(response)
+        // console.log(response)
         this.noticeModalContent = "Workflow saved.";
         this.noticeModalOn = true;
 
@@ -307,26 +314,69 @@ export class EditorCanvasComponent implements AfterViewInit {
 
   loadCustomizedSteps(): void {
     this.customizationSupportService.requestForAllSteps().subscribe(response => {
+      
       for (let eachProcessor of response.data.processors) {
+        let ngFlowchartStepComponent: any;
+        let stepInfoData: StepInfoData = {
+          name: eachProcessor.name,
+            focused: false,
+            id: eachProcessor.id,
+            log: '',
+            error: '',
+            hasError: -1
+        };
+        let iconStr: string = '';
+        
+
+        // Judge the step type.
+        // console.log(eachProcessor);
+        if (!eachProcessor.type || eachProcessor.type == 'process-step') {
+          // console.log('Type is process-step.');
+          eachProcessor.type = 'process-step'
+          ngFlowchartStepComponent = ProcessStepComponent;
+          let processorStepData: ProcessorStepData = {
+            name: eachProcessor.name,
+            focused: false,
+            id: eachProcessor.id,
+            log: '',
+            error: '',
+            hasError: -1,
+            prompt: '',
+            pythonCode: ''
+          }
+          stepInfoData = processorStepData;
+          iconStr = 'bi bi-terminal';
+        }
+        else if (eachProcessor.type == 'subworkflow-step') {
+          /*
+          * It is not allowed to save a customize a subworkflow step yet.
+          */
+          // console.log('Type is subworkflow-step.');
+          ngFlowchartStepComponent = SubworkflowStepComponent;
+          let subworkflowStepData: SubworkflowStepData = {
+            name: eachProcessor.name,
+            focused: false,
+            id: eachProcessor.id,
+            log: '',
+            error: '',
+            hasError: -1,
+            subworkflowId: -1,
+            subWorkflowName: ''
+          }
+          stepInfoData = subworkflowStepData;
+          iconStr = 'bi bi-share';
+        }
+
         let currentStep: StepInfo = {
           paletteName: eachProcessor.name,
             step: {
-              template: ProcessStepComponent,
+              template: ngFlowchartStepComponent,
               type: eachProcessor.type ?? 'process-step',
-              data: {
-                name: eachProcessor.name,
-                prompt: eachProcessor.prompt ?? '',
-                pythonCode: eachProcessor.pythonCode ?? '',
-                subworkflowId: eachProcessor.subworkflowId ?? -1,
-                focused: false,
-                id: eachProcessor.id,
-                log: '',
-                error: '',
-                hasError: -1
-              },
-              icon: 'bi bi-terminal'
+              data: stepInfoData,
+              icon: iconStr
             }
         }
+        // console.log(currentStep);
 
         this.customOps.push(currentStep);
       }

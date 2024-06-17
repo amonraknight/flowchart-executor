@@ -1,6 +1,6 @@
 import { Component, OnInit} from '@angular/core';
 import { NgFlowchartStepComponent, NgFlowchart } from '@joelwenzel/ng-flowchart';
-import { StepInfo } from 'src/app/interfaces/stepInfo';
+import { StepInfo } from 'src/app/interfaces/step-info/stepInfo';
 import { StepEditorCommunicationService } from 'src/app/services/step-editor-communication.service';
 
 
