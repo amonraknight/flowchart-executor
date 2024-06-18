@@ -28,11 +28,11 @@ export class ScriptEditorComponent {
   }
 
   openChat(): void {
-    this.showChat = true
+    this.showChat = true;
   }
 
   closeChat(): void {
-    this.showChat = false
+    this.showChat = false;
   }
 
   renewScript(script: string): void {

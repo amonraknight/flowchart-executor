@@ -341,8 +341,8 @@ export class EditorCanvasComponent implements AfterViewInit {
             log: '',
             error: '',
             hasError: -1,
-            prompt: '',
-            pythonCode: ''
+            prompt: eachProcessor.prompt,
+            pythonCode: eachProcessor.pythonCode
           }
           stepInfoData = processorStepData;
           iconStr = 'bi bi-terminal';
