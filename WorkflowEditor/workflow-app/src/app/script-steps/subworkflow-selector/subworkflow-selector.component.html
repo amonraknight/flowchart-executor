@@ -14,8 +14,11 @@
                     [selected]="eachWorkflow.workflow_id==data.subworkflowId" 
                 >{{ eachWorkflow.workflow_name }}</option>
             </select>
-
         </div>
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-dark" (click)="enterSubWorkflow()">Enter sub-workflow</button>
+        </div>
+        
         
     </div>
 </div>

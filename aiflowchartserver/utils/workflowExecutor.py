@@ -3,8 +3,10 @@ import types
 import pickle
 import sys
 from io import StringIO
+import json
 
 from utils.importextracter import getImportScript
+from flowchartagent.models import Workflow
 
 
 class WorkflowExecutor:
@@ -38,29 +40,46 @@ class WorkflowExecutor:
         treeHasException = 0
 
         stepId = inputWorkflowDict['id']
-        scriptStr = inputWorkflowDict['data']['pythonCode']
-        print('Step ID: %s \nScript: %s ' % (stepId, scriptStr))
 
-        # Redirect the log.
-        backup_stdout = sys.stdout
-        sys.stdout = StringIO()
-        try:
-            libLocalVar = {}
+        if inputWorkflowDict['type'] == 'process-step':
 
-            # Prepare the import of libraries, get put the lib to global var.
-            libImportScript = getImportScript(scriptStr)
-            exec(libImportScript, {}, libLocalVar)
-            globalVar.update(libLocalVar)
+            scriptStr = inputWorkflowDict['data']['pythonCode']
+            print('Step ID: %s \nScript: %s ' % (stepId, scriptStr))
 
-            exec(scriptStr, globalVar, localVar)
+            # Redirect the log.
+            backup_stdout = sys.stdout
+            sys.stdout = StringIO()
+            try:
+                libLocalVar = {}
+
+                # Prepare the import of libraries, get put the lib to global var.
+                libImportScript = getImportScript(scriptStr)
+                exec(libImportScript, {}, libLocalVar)
+                globalVar.update(libLocalVar)
+
+                exec(scriptStr, globalVar, localVar)
+                error = ''
+            except Exception as e:
+                error = str(e)
+                thisStepException = 1
+
+            log = sys.stdout.getvalue()
+            sys.stdout = backup_stdout
+
+        elif inputWorkflowDict['type'] == 'subworkflow-step':
+            # Execute a sub-workflow
+            subworkflowID = inputWorkflowDict['data']['subworkflowId']
+            targetWorkflow = Workflow.objects.get(pk=subworkflowID)
+            targetWorkflowDict = json.loads(targetWorkflow.workflow_json)['root']
+
+            # Not to support the handing over of variables.
+            subworkflowDict, thisStepException = self._executeAllSince(targetWorkflowDict)
+
+            # Prepare the log and error
+            log = ''
             error = ''
-        except Exception as e:
-            error = str(e)
-            thisStepException = 1
 
-        log = sys.stdout.getvalue()
-        sys.stdout = backup_stdout
-
+        # Collect log and exceptions
         inputWorkflowDict['data']['log'] = log
         inputWorkflowDict['data']['error'] = error
         inputWorkflowDict['data']['hasError'] = thisStepException
@@ -96,3 +115,6 @@ class WorkflowExecutor:
             else:
                 copiedVars[key] = copy.deepcopy(value)
         return copiedVars
+
+    def _executeASubWorkflow(self, workflowId):
+        return ''

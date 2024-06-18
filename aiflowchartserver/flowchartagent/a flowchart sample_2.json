@@ -1,0 +1,34 @@
+{
+  "root": {
+    "id": "s1718628225840",
+    "type": "process-step",
+    "data": {
+      "name": "Get datetime",
+      "focused": false,
+      "id": 51,
+      "log": "",
+      "error": "",
+      "hasError": -1,
+      "prompt": "",
+      "pythonCode": ""
+    },
+    "children": [
+      {
+        "id": "s1718628223346",
+        "type": "subworkflow-step",
+        "data": {
+          "name": "Subworkflow Step",
+          "subworkflowId": "3",
+          "subWorkflowName": "select a workflow...",
+          "focused": true,
+          "id": 0,
+          "log": "",
+          "error": "",
+          "hasError": -1
+        },
+        "children": []
+      }
+    ]
+  },
+  "connectors": []
+}

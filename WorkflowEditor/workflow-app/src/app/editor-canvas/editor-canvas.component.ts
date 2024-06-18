@@ -1,5 +1,6 @@
-import { AfterViewInit, Component, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { AfterViewInit, Component, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, OnDestroy } from '@angular/core';
 import { NgFlowchart, NgFlowchartStepRegistry, NgFlowchartCanvasDirective } from '@joelwenzel/ng-flowchart';
+import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { NestedFlowComponent } from '../nested-flow/nested-flow.component';
 import { ProcessStepComponent } from '../script-steps/process-step/process-step.component';
@@ -21,7 +22,7 @@ import { StepInfoData } from '../interfaces/step-info/stepInfoData';
   providers: [StepEditorCommunicationService]
 })
 
-export class EditorCanvasComponent implements AfterViewInit {
+export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
   
   callbacks: NgFlowchart.Callbacks = {};
   options: NgFlowchart.Options = {
@@ -110,22 +111,18 @@ export class EditorCanvasComponent implements AfterViewInit {
   noticeModalOn = false;
   noticeModalContent = '';
 
-  ngAfterViewInit() {
-    this.stepRegistry.registerStep('process-step', ProcessStepComponent);
-    this.stepRegistry.registerStep('subworkflow-step', SubworkflowStepComponent);
-    this.loadWorkflow();
-    this.loadCustomizedSteps();
-  }
+  // Stack of subworkflows
+  private workflowStack: number[] = [];
 
   constructor(private stepRegistry: NgFlowchartStepRegistry, 
     private executionSupportService: ExecutionSupportService,
     private customizationSupportService: CustomizationSupportService, 
     private eleRef: ElementRef, 
     private stepEditorCommunicationService: StepEditorCommunicationService,
-//   private appRef: ApplicationRef,
     private workflowSupportService: WorkflowSupportService,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private location: Location
   ) {
     this.callbacks.onDropError = this.onDropError;
     this.callbacks.onMoveError = this.onMoveError;
@@ -141,7 +138,26 @@ export class EditorCanvasComponent implements AfterViewInit {
         
         this.addCustomizedStep(stepInfo);
       }
-    )
+    );
+
+    stepEditorCommunicationService.zoomToFlow$.subscribe(
+      nextWorkflowId => {
+        this.workflowStack.push(this.workflowID);
+        this.loadWorkflow(nextWorkflowId);
+      }
+    );
+  }
+
+  ngAfterViewInit() {
+    this.stepRegistry.registerStep('process-step', ProcessStepComponent);
+    this.stepRegistry.registerStep('subworkflow-step', SubworkflowStepComponent);
+    this.loadWorkflow(-1);
+    this.loadCustomizedSteps();
+  }
+
+  ngOnDestroy() {
+    this.stepEditorCommunicationService.customizeStep$.subscribe().unsubscribe();
+    this.stepEditorCommunicationService.zoomToFlow$.subscribe().unsubscribe();
   }
 
 
@@ -165,6 +181,8 @@ export class EditorCanvasComponent implements AfterViewInit {
     console.log(conn);
   }
 
+  
+
   afterDeleteConnector(conn: any): void {
     console.log(conn);
   }
@@ -182,8 +200,11 @@ export class EditorCanvasComponent implements AfterViewInit {
     
   }
 
-  loadWorkflow(): void {
-    const workflowID = Number(this.route.snapshot.paramMap.get('workflowID'));
+  loadWorkflow(workflowID: number): void {
+    if (workflowID==-1) {
+      workflowID = Number(this.route.snapshot.paramMap.get('workflowID'));
+    }
+    this.workflowID = workflowID;
     
     let workflowJson;
 
@@ -198,7 +219,6 @@ export class EditorCanvasComponent implements AfterViewInit {
         this.canvas?.getFlow().upload(workflowJson);
       })
   
-      
     }
 
     if(!workflowJson) {
@@ -433,6 +453,16 @@ export class EditorCanvasComponent implements AfterViewInit {
    
     this.confirmModalOnClearCanvas = false;
     
+  }
+
+  goBack(): void {
+    console.log(this.workflowStack);
+    if(this.workflowStack.length>0) {
+      let previousWorkflowId = this.workflowStack.pop();
+      if(previousWorkflowId) {
+        this.loadWorkflow(previousWorkflowId);
+      }
+    }
   }
 }
 

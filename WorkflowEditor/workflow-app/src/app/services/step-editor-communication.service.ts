@@ -8,10 +8,17 @@ import { Subject } from 'rxjs';
 export class StepEditorCommunicationService {
   // Observable source
   private customizeStepSource = new Subject<StepInfo>();
-
   customizeStep$ = this.customizeStepSource.asObservable();
 
   addCustomizedStep(stepInfo: StepInfo) {
     this.customizeStepSource.next(stepInfo);
   }
+
+  // Going to subworkflow by ID.
+  private workflowId = new Subject<number>();
+  zoomToFlow$ = this.workflowId.asObservable();
+  zoomToSubWorkflow(workflowId: number) {
+    this.workflowId.next(workflowId);
+  }
+
 }

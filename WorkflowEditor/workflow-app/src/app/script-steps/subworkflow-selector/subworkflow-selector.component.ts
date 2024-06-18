@@ -1,5 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectorRef } from '@angular/core';
 import { WorkflowSupportService } from 'src/app/services/workflow-support.service';
+import { Router } from '@angular/router';
+import { StepEditorCommunicationService } from 'src/app/services/step-editor-communication.service';
 
 @Component({
   selector: 'app-subworkflow-selector',
@@ -17,7 +19,9 @@ export class SubworkflowSelectorComponent implements OnInit {
   
   constructor(
     private workflowSupportService: WorkflowSupportService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private stepEditorCommunicationService: StepEditorCommunicationService,
+    private router: Router
   ) {
 
   }
@@ -33,6 +37,12 @@ export class SubworkflowSelectorComponent implements OnInit {
 
   closeModal(): void {
     this.closeEvent.emit();
+  }
+
+  enterSubWorkflow(): void {
+
+    // Change the workflow by altering the ID on the canvas page.
+    this.stepEditorCommunicationService.zoomToSubWorkflow(this.data.subworkflowId);
   }
 
 }
