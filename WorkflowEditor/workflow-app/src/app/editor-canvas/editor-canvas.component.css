@@ -111,10 +111,14 @@
 
   .left-div {
     width: 80%;
+    display: flex;
+    justify-content: flex-start;
   }
 
   .right-div {
     width: 20%;
+    display: flex;
+    justify-content: flex-end;
   }
 
 

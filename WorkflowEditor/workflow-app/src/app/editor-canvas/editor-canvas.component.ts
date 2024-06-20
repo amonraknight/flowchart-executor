@@ -112,7 +112,7 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
   noticeModalContent = '';
 
   // Stack of subworkflows
-  private workflowStack: number[] = [];
+  workflowStack: number[] = [];
 
   constructor(private stepRegistry: NgFlowchartStepRegistry, 
     private executionSupportService: ExecutionSupportService,
