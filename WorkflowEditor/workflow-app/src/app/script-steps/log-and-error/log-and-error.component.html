@@ -1,0 +1,14 @@
+<div class = "popup-modal">
+    <div class="modal-content">
+        <i class="bi bi-x-circle-fill close-icon" (click)="closeModal()"></i>
+        
+        <div class="mb-3">
+            <label class="form-label">Log</label>            
+            <textarea class="form-control log-text" [(ngModel)]="logStr" readonly></textarea>
+
+            <label class="form-label">Error</label>            
+            <textarea class="form-control log-text" [(ngModel)]="errorStr" readonly></textarea>
+        </div>
+        
+    </div>
+</div>

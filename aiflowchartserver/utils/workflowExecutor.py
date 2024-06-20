@@ -76,8 +76,7 @@ class WorkflowExecutor:
             subworkflowDict, thisStepException = self._executeAllSince(targetWorkflowDict)
 
             # Prepare the log and error
-            log = ''
-            error = ''
+            log, error = _getAllLogAndErrorAlongTree(subworkflowDict)
 
         # Collect log and exceptions
         inputWorkflowDict['data']['log'] = log
@@ -116,5 +115,16 @@ class WorkflowExecutor:
                 copiedVars[key] = copy.deepcopy(value)
         return copiedVars
 
-    def _executeASubWorkflow(self, workflowId):
-        return ''
+
+def _getAllLogAndErrorAlongTree(workflowTreeDict):
+    stepLog = workflowTreeDict['data']['log']
+    stepError = workflowTreeDict['data']['error']
+
+    childrenWorkflows = workflowTreeDict['children']
+
+    for eachSubWorkflowDict in childrenWorkflows:
+        subLog, subError = _getAllLogAndErrorAlongTree(eachSubWorkflowDict)
+        stepLog = stepLog + ' --- \n' + subLog
+        stepError = stepError + ' --- \n' + stepError
+
+    return stepLog, stepError

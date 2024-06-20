@@ -19,20 +19,9 @@
     (saveStepEvent)="saveAsCustomizedStep()"
 ></app-script-editor>
 
-<div *ngIf="showLog" class = "popup-modal">
-    <div class="modal-content">
-        <i class="bi bi-x-circle-fill close-icon" (click)="showLog=false"></i>
-        
-        <div class="mb-3">
-            <label class="form-label">Log</label>            
-            <textarea class="form-control log-text" [(ngModel)]="data.log" readonly></textarea>
-
-            <label class="form-label">Error</label>            
-            <textarea class="form-control log-text" [(ngModel)]="data.error" readonly></textarea>
-        </div>
-        
-    </div>
-</div>
-
-
-
+<app-log-and-error
+    *ngIf="showLog"
+    [logStr]="data.log"
+    [errorStr]="data.error"
+    (closeEvent)="showLog = false"
+></app-log-and-error>

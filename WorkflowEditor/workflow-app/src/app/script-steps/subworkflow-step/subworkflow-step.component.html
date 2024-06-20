@@ -16,3 +16,10 @@
   [data]="data"
   (closeEvent)="showModal = false"
 ></app-subworkflow-selector>
+
+<app-log-and-error
+    *ngIf="showLog"
+    [logStr]="data.log"
+    [errorStr]="data.error"
+    (closeEvent)="showLog = false"
+></app-log-and-error>

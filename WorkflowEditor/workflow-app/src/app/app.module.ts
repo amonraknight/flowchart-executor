@@ -23,6 +23,7 @@ import { NoticeModalComponent } from './util-components/notice-modal/notice-moda
 import { ScriptEditorComponent } from './script-steps/script-editor/script-editor.component';
 import { SubworkflowStepComponent } from './script-steps/subworkflow-step/subworkflow-step.component';
 import { SubworkflowSelectorComponent } from './script-steps/subworkflow-selector/subworkflow-selector.component';
+import { LogAndErrorComponent } from './script-steps/log-and-error/log-and-error.component';
 
 
 @NgModule({
@@ -39,7 +40,8 @@ import { SubworkflowSelectorComponent } from './script-steps/subworkflow-selecto
     NoticeModalComponent,
     ScriptEditorComponent,
     SubworkflowStepComponent,
-    SubworkflowSelectorComponent
+    SubworkflowSelectorComponent,
+    LogAndErrorComponent
   ],
   imports: [
     BrowserModule,
