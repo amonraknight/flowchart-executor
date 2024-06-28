@@ -14,6 +14,7 @@ from objects.generalResponseBody import GeneralResponseBody
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
+
 '''
 Request sample:
 

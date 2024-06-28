@@ -143,4 +143,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 # Global variables used by views:
 ZHIPUBASE = None
 
+# Celery setup
+CELERY_BROKER_URL = 'pyamqp://admin:admin@localhost//'
+CELERY_RESULT_BACKEND = 'rpc://'
 
