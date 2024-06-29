@@ -4,7 +4,7 @@ A GUI tool to execute Python scripts in flowcharts.
 
 This GUI tool has its backend under \aiflowchartserver and front end under \WorkflowEditor.
 
----
+----
 
 ## Backend: A Djangdo server project.
 
@@ -14,8 +14,8 @@ Python 3.12.2
 Django 5.0.4
 django-cors-headers 4.3.1
 mysqlclient 2.2.4
-
-
+Celery 5.4.0
+eventlet 0.36.1  (Windows only)
 
 ### Structure
 
@@ -29,14 +29,25 @@ mysqlclient 2.2.4
 
 5. **zhipuvisit** contains the tools for Zhipu API visiting.
 
+6. **celeryapp** is the celery application, the asynchronous task executer.
+
 ### Database
 
-This project depends on a MySQL database 8.0.23. 
+This project depends on a MySQL database 8.0.23.
+
+### Message Queue
+
+This project uses a RabbitMQ as a broker and result backend of Celery tasks. Celery adapts to Redis and many MQs. Please find "CELERY_" attributes on "\flowchart-executor\aiflowchartserver\aiflowchartserver\settings.py" and setup the links there.
 
 
 ### Configurations
 
-1. The DB configuration is at "\flowchart-executor\aiflowchartserver\aiflowchartserver\mysqldb.cnf". It is not directly provide on git. Please create a text file and copy the following configuraiton there. Update the username and password.
+1. The Djando settings are at "\flowchart-executor\aiflowchartserver\aiflowchartserver\settings.py". 
+
+The Celery service also use the same configuration file. 
+
+
+2. The DB configuration is at "\flowchart-executor\aiflowchartserver\aiflowchartserver\mysqldb.cnf". It is not directly provide on git. Please create a text file and copy the following configuraiton there. Update the username and password.
 
 ```
 [client]
@@ -46,7 +57,7 @@ password = ????
 default-character-set = utf8
 ```
 
-2. To activate AI programing, add your Zhipu API key to "\flowchart-executor\aiflowchartserver\zhipuvisit\apikey.txt".
+3. To activate AI programing, add your Zhipu API key to "\flowchart-executor\aiflowchartserver\zhipuvisit\apikey.txt".
 
 ### Data model migration
 
@@ -55,11 +66,24 @@ Execute "python manage.py migrate" at "\flowchart-executor\aiflowchartserver" to
 
 ### Start Server
 
-It is recommended to develop and test this project in Idea. Open project folder "aiflowchartserver", in the run configuration, add "manage.py" as the script and add "runserver 8100" as the parameter. 
+Please be sure that the DB and MQ are in service before starting the server.
+
+1. It is recommended to develop and test this project in Idea. Open project folder "aiflowchartserver", in the run configuration, add "manage.py" as the script and add "runserver 8100" as the parameter.
 
 If to run in commandline, execute `python manage.py runserver 8100`.
 
----
+2. Start the Celery service.
+
+Ceed to path "\flowchart-executor\aiflowchartserver". If on Windows, execute the following command. 
+
+```cmd
+celery -A celeryapp worker --loglevel=INFO -P eventlet
+```
+
+If you are on Linux, "-P eventlet" is not necessary.
+
+
+----
 
 ## Front end: WorkflowApp
 
