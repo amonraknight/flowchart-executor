@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { WorkflowSupportService } from '../services/workflow-support.service';
+import { environment } from 'src/environments/environment';
+
 
 @Component({
   selector: 'app-workflow-list',
@@ -9,8 +11,10 @@ import { WorkflowSupportService } from '../services/workflow-support.service';
 export class WorkflowListComponent {
 
   constructor(private workflowSupportService: WorkflowSupportService) {
-
+  
   }
+  
+  
 
   workflows: any[] = [];
   confirmModalOn = false;
@@ -60,4 +64,6 @@ workflowDict = {
 
     this.confirmModalOn = false;
   }
+
+
 }

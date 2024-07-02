@@ -13,6 +13,8 @@ import { WorkflowSupportService } from '../services/workflow-support.service';
 import { ProcessorStepData } from '../interfaces/step-info/processorStepData';
 import { SubworkflowStepData } from '../interfaces/step-info/subsworkflowStepData';
 import { StepInfoData } from '../interfaces/step-info/stepInfoData';
+import { environment } from 'src/environments/environment';
+
 
 @Component({
   selector: 'app-editor-canvas',
@@ -23,7 +25,7 @@ import { StepInfoData } from '../interfaces/step-info/stepInfoData';
 })
 
 export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
-  
+
   callbacks: NgFlowchart.Callbacks = {};
   options: NgFlowchart.Options = {
     stepGap: 40,
@@ -146,6 +148,7 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
         this.loadWorkflow(nextWorkflowId);
       }
     );
+    
   }
 
   ngAfterViewInit() {
@@ -153,6 +156,16 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
     this.stepRegistry.registerStep('subworkflow-step', SubworkflowStepComponent);
     this.loadWorkflow(-1);
     this.loadCustomizedSteps();
+
+    //WebSocket
+    this.executionSupportService.receiveMessage().subscribe((response) => {
+      console.log('Received message: ', response.data);
+      console.log(response.data);
+      // Load workflow
+      this.canvas?.getFlow().upload(response.data);
+      //Render
+      this.cdr.detectChanges();
+    })
   }
 
   ngOnDestroy() {
@@ -283,9 +296,9 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
         console.log(response);
         
         // Load workflow
-        this.canvas?.getFlow().upload(response.data);
+        // this.canvas?.getFlow().upload(response.data);
         //Render
-        this.cdr.detectChanges();
+        // this.cdr.detectChanges();
       });
     }
   }
@@ -464,6 +477,8 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
       }
     }
   }
+
+
 }
 
 

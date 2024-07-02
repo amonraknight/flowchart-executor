@@ -27,7 +27,7 @@ export class ChatSupportService extends CommonRequestService {
     console.log(subscribe);
     return subscribe
     .pipe(
-      tap(() => this.log('Seceived a reply.')),
+      tap(() => this.log('Received a reply.')),
       catchError(this.handleError<ResponseFromBack>('post error'))
     );
   } 

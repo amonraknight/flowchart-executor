@@ -5,8 +5,11 @@ from celery import Celery
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'aiflowchartserver.settings')
 
 # If not providing the backend and broker here, the Django server is not able to acquire the settings.
-# app = Celery('celeryjob', backend='rpc://', broker='pyamqp://admin:admin@localhost//')
+# app = Celery('celeryjob', backend='redis://localhost:6379/1', broker='redis://localhost:6379/0')
 app = Celery('celeryjob')
+
+# app.conf.broker_url = 'redis://localhost:6379/0'
+# app.conf.result_backend = 'redis://localhost:6379/1'
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
@@ -17,7 +20,8 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Needs to provide the apps having "tasks.py".
 app.autodiscover_tasks(['flowchartagent'])
 
-
+'''
 @app.task(bind=True, ignore_result=True)
 def debug_task(self):
     print(f'Request: {self.request!r}')
+'''

@@ -1,3 +1,5 @@
+# This file must be named as "tasks.py". Otherwise Celery will not be able to find it.
+
 from celery import shared_task
 import sys
 from io import StringIO
@@ -7,26 +9,30 @@ import json
 
 from flowchartagent.models import Workflow
 from utils.importextracter import getImportScript
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 @shared_task
-def add(x, y):
-    return x + y
-
-
-@shared_task
-def mul(x, y):
-    return x * y
-
-
-@shared_task
-def xsum(numbers):
-    return sum(numbers)
-
-
-@shared_task
-def executeWorkflow(inputWorkflowDict):
+def executeWorkflow(inputWorkflowDict, clientID=1):
     workflowDict, treeHasException = _executeAllSince(inputWorkflowDict)
-    return workflowDict, treeHasException
+
+    if treeHasException == 1:
+        message = "Encountered an exception!"
+        # Script exception
+        status = 2
+    else:
+        message = "All scripts have executed successfully."
+        status = 1
+
+    # Push the result to the front end.
+    channel_layer = get_channel_layer()
+    print('Execution finished. client_%s' % clientID)
+    print(channel_layer)
+    async_to_sync(channel_layer.group_send)(
+        "client_%s" % clientID,
+        {"type": "backend.message", "message": message, "status": status, "data": {'root': workflowDict}}
+    )
+
 
 
 def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}):
@@ -103,7 +109,7 @@ def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}):
     return inputWorkflowDict, treeHasException
 
 
-def _copyEnvVariables(self, lovalVar):
+def _copyEnvVariables(lovalVar):
     copiedVars = {}
     for key, value in lovalVar.items():
         if isinstance(value, types.ModuleType):

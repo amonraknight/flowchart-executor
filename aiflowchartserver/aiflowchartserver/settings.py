@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -27,18 +26,21 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
+# make sure daphne is at the top of your INSTALLED_APPS
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'corsheaders',
-	'flowchartagent.apps.FlowchartagentConfig'
+    'corsheaders',
+    # 'flowchartagent.apps.FlowchartagentConfig',
+    'flowchartagent',
+    'celeryapp'  # This will include the setups on celery.py.
 ]
 
 MIDDLEWARE = [
@@ -49,7 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	'corsheaders.middleware.CorsMiddleware'
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'aiflowchartserver.urls'
@@ -72,7 +74,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'aiflowchartserver.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -91,11 +92,10 @@ DATABASES = {
         "OPTIONS": {
             "read_default_file": "aiflowchartserver/mysqldb.cnf",
         },
-		"HOST": "localhost",
-		"PORT": "3306"
+        "HOST": "localhost",
+        "PORT": "3306"
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -115,7 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -126,7 +125,6 @@ TIME_ZONE = 'Asia/Shanghai'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -144,6 +142,31 @@ CORS_ALLOW_ALL_ORIGINS = True
 ZHIPUBASE = None
 
 # Celery setup
-CELERY_BROKER_URL = 'pyamqp://admin:admin@localhost//'
-CELERY_RESULT_BACKEND = 'rpc://'
+# CELERY_BROKER_URL = 'pyamqp://admin:admin@localhost//'
+# CELERY_RESULT_BACKEND = 'rpc://'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# Memory backend.
+'''
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+'''
+
+# Redis backend
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+# Daphne
+ASGI_APPLICATION = "aiflowchartserver.asgi.application"
 
