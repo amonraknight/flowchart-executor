@@ -35,9 +35,9 @@ eventlet 0.36.1  (Windows only)
 
 This project depends on a MySQL database 8.0.23.
 
-### Message Queue
+### Redis
 
-This project uses a RabbitMQ as a broker and result backend of Celery tasks. Celery adapts to Redis and many MQs. Please find "CELERY_" attributes on "\flowchart-executor\aiflowchartserver\aiflowchartserver\settings.py" and setup the links there.
+Both Celery and Channels requires Redis as a broker. Please find "CELERY_" attributes and CHANNEL_LAYERS on "\flowchart-executor\aiflowchartserver\aiflowchartserver\settings.py" and setup the links there.
 
 
 ### Configurations
@@ -66,7 +66,7 @@ Execute "python manage.py migrate" at "\flowchart-executor\aiflowchartserver" to
 
 ### Start Server
 
-Please be sure that the DB and MQ are in service before starting the server.
+Please be sure that the DB and Redis are in service before starting the server.
 
 1. It is recommended to develop and test this project in Idea. Open project folder "aiflowchartserver", in the run configuration, add "manage.py" as the script and add "runserver 8100" as the parameter.
 
