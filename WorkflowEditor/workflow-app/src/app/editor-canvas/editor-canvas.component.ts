@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, OnDestroy } from '@angular/core';
 import { NgFlowchart, NgFlowchartStepRegistry, NgFlowchartCanvasDirective } from '@joelwenzel/ng-flowchart';
-import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { NestedFlowComponent } from '../nested-flow/nested-flow.component';
 import { ProcessStepComponent } from '../script-steps/process-step/process-step.component';
@@ -13,7 +12,7 @@ import { WorkflowSupportService } from '../services/workflow-support.service';
 import { ProcessorStepData } from '../interfaces/step-info/processorStepData';
 import { SubworkflowStepData } from '../interfaces/step-info/subsworkflowStepData';
 import { StepInfoData } from '../interfaces/step-info/stepInfoData';
-import { environment } from 'src/environments/environment';
+import { NgFlowchartStepComponent } from '@joelwenzel/ng-flowchart';
 
 
 @Component({
@@ -123,8 +122,7 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
     private stepEditorCommunicationService: StepEditorCommunicationService,
     private workflowSupportService: WorkflowSupportService,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef,
-    private location: Location
+    private cdr: ChangeDetectorRef
   ) {
     this.callbacks.onDropError = this.onDropError;
     this.callbacks.onMoveError = this.onMoveError;
@@ -159,12 +157,13 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
 
     //WebSocket
     this.executionSupportService.receiveMessage().subscribe((response) => {
-      console.log('Received message: ', response.data);
-      console.log(response.data);
+      // console.log('Received message: ', response.data);
+      // console.log(response.data);
       // Load workflow
       this.canvas?.getFlow().upload(response.data);
       //Render
       this.cdr.detectChanges();
+      this.disabled = false;
     })
   }
 
@@ -210,7 +209,30 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
         }
       });
     }
-    
+  }
+
+  // Cleanup data.log, data.error and data.hasError.
+  _resetExecutionStatus(workflowComponent?: NgFlowchartStepComponent): void {
+    let currentComponent: NgFlowchartStepComponent = new NgFlowchartStepComponent;
+    if (workflowComponent) {
+      currentComponent = workflowComponent;
+    }
+    else if (!workflowComponent && this.canvas) {
+      console.log('Clean all components.');
+      currentComponent = this.canvas.getFlow().getRoot();
+      
+    }
+
+    currentComponent.data.log = '';
+    currentComponent.data.focused = false;
+    currentComponent.data.error = '';
+    currentComponent.data.hasError = -1;
+    currentComponent.children.forEach(step => {
+      if (step instanceof NgFlowchartStepComponent) {
+        // console.log(step);
+        this._resetExecutionStatus(step);
+      }
+    });
   }
 
   loadWorkflow(workflowID: number): void {
@@ -290,6 +312,8 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
   }
 
   executeAll():void {
+    this._resetExecutionStatus();
+    this.disabled = true;
     if(this.canvas) {
       //EXECUTE_ALL, EXECUTE_STEP, EXECUTE_ALL_SINCE
       this.executionSupportService.requestExection('EXECUTE_ALL', this.canvas?.getFlow().toJSON(4)).subscribe(response => {
@@ -303,7 +327,8 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  executeStep():void {
+  executeStep(): void {
+    
     if(this.canvas) {
       //EXECUTE_ALL, EXECUTE_STEP, EXECUTE_ALL_SINCE
       this.executionSupportService.requestExection('EXECUTE_STEP', this.canvas?.getFlow().toJSON(4)).subscribe(data => {
@@ -333,6 +358,7 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
 
   saveWorkflow():void {
     if(this.canvas) {
+      this._resetExecutionStatus();
       this.workflowSupportService.requestSaveWorkflow(this.workflowID, this.workflowName, this.workflowDescription, this.canvas?.getFlow().toJSON(4), 1)
       .subscribe(response => {
         // console.log(response)
