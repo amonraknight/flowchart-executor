@@ -6,11 +6,13 @@ from io import StringIO
 import copy
 import types
 import json
+from concurrent.futures import ThreadPoolExecutor
 
 from flowchartagent.models import Workflow
 from utils.importextracter import getImportScript
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+
 
 @shared_task
 def executeWorkflow(inputWorkflowDict, clientID=1):
@@ -32,7 +34,6 @@ def executeWorkflow(inputWorkflowDict, clientID=1):
         "client_%s" % clientID,
         {"type": "backend.message", "message": message, "status": status, "data": {'root': workflowDict}}
     )
-
 
 
 def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}):
@@ -79,7 +80,6 @@ def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}):
         # Prepare the log and error
         log, error = _getAllLogAndErrorAlongTree(subworkflowDict)
 
-
     # Collect log and exceptions
     inputWorkflowDict['data']['log'] = log
     inputWorkflowDict['data']['error'] = error
@@ -91,12 +91,20 @@ def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}):
     # Stop if has exception or has no children.
     if thisStepException == 0 and children and len(children) > 0:
         executedChildrenWF = []
-        for eachChild in children:
-            childGlobalVar = _copyEnvVariables(globalVar)
-            # Inherit all the modules, copy others.
-            childLocalVar = _copyEnvVariables(localVar)
-            # print(pickle.dumps(childGlobalVar))
-            childWorkflow, childHasException = _executeAllSince(eachChild, childGlobalVar, childLocalVar)
+        childrenJobList = []
+
+        # Inherit all the modules, copy others.
+        childGlobalVar = _copyEnvVariables(globalVar)
+        childLocalVar = _copyEnvVariables(localVar)
+
+        # Execute all children in a concurrent way.
+        with ThreadPoolExecutor(3) as pool:
+            for eachChild in children:
+                childJob = pool.submit(_executeAllSince, eachChild, childGlobalVar, childLocalVar)
+                childrenJobList.append(childJob)
+
+        for eachJob in childrenJobList:
+            childWorkflow, childHasException = eachJob.result()
             if childHasException == 1:
                 treeHasException = 1
             executedChildrenWF.append(childWorkflow)
