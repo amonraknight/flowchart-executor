@@ -157,13 +157,22 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
 
     //WebSocket
     this.executionSupportService.receiveMessage().subscribe((response) => {
-      // console.log('Received message: ', response.data);
-      // console.log(response.data);
-      // Load workflow
-      this.canvas?.getFlow().upload(response.data);
-      //Render
-      this.cdr.detectChanges();
-      this.disabled = false;
+
+      if(response.status==0) {
+        //step update
+        let renewedWorkflow = this.renewStepStatus(this.canvas?.getFlow().toObject(), response.data.finishedStep, response.data.hasError);
+        // console.log(renewedWorkflow);
+        this.canvas?.getFlow().upload(renewedWorkflow);
+
+      } else if (response.status==1 || response.status==2) {
+        // Load workflow
+        this.canvas?.getFlow().upload(response.data);
+        //Render
+        this.cdr.detectChanges();
+        this.disabled = false;
+      }
+
+
     })
   }
 
@@ -182,11 +191,11 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
   }
 
   beforeDeleteStep(step: any): void {
-    console.log(JSON.stringify(step.children));
+    // console.log(JSON.stringify(step.children));
   }
 
   afterDeleteStep(step: any): void {
-    console.log(JSON.stringify(step.children));
+    // console.log(JSON.stringify(step.children));
   }
 
   onLinkConnector(conn: any): void {
@@ -313,16 +322,12 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
 
   executeAll():void {
     this._resetExecutionStatus();
-    this.disabled = true;
+    
     if(this.canvas) {
       //EXECUTE_ALL, EXECUTE_STEP, EXECUTE_ALL_SINCE
       this.executionSupportService.requestExection('EXECUTE_ALL', this.canvas?.getFlow().toJSON(4)).subscribe(response => {
-        console.log(response);
-        
-        // Load workflow
-        // this.canvas?.getFlow().upload(response.data);
-        //Render
-        // this.cdr.detectChanges();
+        // console.log(response);
+        this.disabled = true;
       });
     }
   }
@@ -502,6 +507,29 @@ export class EditorCanvasComponent implements AfterViewInit, OnDestroy {
         this.loadWorkflow(previousWorkflowId);
       }
     }
+  }
+
+  // Cascade all steps
+  renewStepStatus(workflowObject: any, stepId: string, hasError: number): any {
+    // console.log(workflowObject);
+    if ('root' in workflowObject) {
+      let rootObject = this.renewStepStatus(workflowObject.root, stepId, hasError);
+      workflowObject.root = rootObject;
+    } else {
+      if (workflowObject.id == stepId) {
+        workflowObject.data.hasError = hasError;
+      } else if (workflowObject.children.length > 0) {
+        // console.log(workflowObject.children);
+        let tempChildren = [];
+        for (let eachChild in workflowObject.children) {
+          // console.log(workflowObject.children[eachChild]);
+          eachChild = this.renewStepStatus(workflowObject.children[eachChild], stepId, hasError)
+          tempChildren.push(eachChild);
+        }
+        workflowObject.children = tempChildren;
+      }
+    }
+    return workflowObject;
   }
 
 

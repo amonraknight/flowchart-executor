@@ -16,7 +16,10 @@ from asgiref.sync import async_to_sync
 
 @shared_task
 def executeWorkflow(inputWorkflowDict, clientID=1):
-    workflowDict, treeHasException = _executeAllSince(inputWorkflowDict)
+    channel_layer = get_channel_layer()
+    print('Execution finished. client_%s' % clientID)
+    workflowDict, treeHasException = _executeAllSince(inputWorkflowDict=inputWorkflowDict, channel_layer=channel_layer,
+                                                      clientID=clientID)
 
     if treeHasException == 1:
         message = "Encountered an exception!"
@@ -27,16 +30,12 @@ def executeWorkflow(inputWorkflowDict, clientID=1):
         status = 1
 
     # Push the result to the front end.
-    channel_layer = get_channel_layer()
-    print('Execution finished. client_%s' % clientID)
-    print(channel_layer)
-    async_to_sync(channel_layer.group_send)(
-        "client_%s" % clientID,
-        {"type": "backend.message", "message": message, "status": status, "data": {'root': workflowDict}}
-    )
+
+    # print(channel_layer)
+    _pushToFrontEnd(channel_layer, clientID, {"message": message, "status": status, "data": {'root': workflowDict}})
 
 
-def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}):
+def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}, channel_layer=None, clientID=1):
     thisStepException = 0
     treeHasException = 0
 
@@ -64,7 +63,10 @@ def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}):
             error = str(e)
             thisStepException = 1
 
-        log = sys.stdout.getvalue()
+        try:
+            log = sys.stdout.getvalue()
+        except Exception as e:
+            log = 'Not able to retrive the log.'
         sys.stdout = backup_stdout
 
     elif inputWorkflowDict['type'] == 'subworkflow-step':
@@ -75,7 +77,8 @@ def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}):
         targetWorkflowDict = json.loads(targetWorkflow.workflow_json)['root']
 
         # Not to support the handing over of variables.
-        subworkflowDict, thisStepException = _executeAllSince(targetWorkflowDict)
+        subworkflowDict, thisStepException = _executeAllSince(targetWorkflowDict=targetWorkflowDict,
+                                                              channel_layer=channel_layer, clientID=clientID)
 
         # Prepare the log and error
         log, error = _getAllLogAndErrorAlongTree(subworkflowDict)
@@ -84,6 +87,10 @@ def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}):
     inputWorkflowDict['data']['log'] = log
     inputWorkflowDict['data']['error'] = error
     inputWorkflowDict['data']['hasError'] = thisStepException
+
+    # Return a signal to the front.
+    bodyDict = {"message": 'In execution', "status": 0, "data": {'finishedStep': stepId, 'hasError': thisStepException}}
+    _pushToFrontEnd(channel_layer, clientID, bodyDict)
 
     # all children:
     children = inputWorkflowDict['children']
@@ -98,9 +105,13 @@ def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}):
         childLocalVar = _copyEnvVariables(localVar)
 
         # Execute all children in a concurrent way.
+
+        # Multi-thread:
+        '''
         with ThreadPoolExecutor(3) as pool:
             for eachChild in children:
-                childJob = pool.submit(_executeAllSince, eachChild, childGlobalVar, childLocalVar)
+                childJob = pool.submit(_executeAllSince, eachChild, childGlobalVar, childLocalVar, channel_layer,
+                                       clientID)
                 childrenJobList.append(childJob)
 
         for eachJob in childrenJobList:
@@ -108,6 +119,15 @@ def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}):
             if childHasException == 1:
                 treeHasException = 1
             executedChildrenWF.append(childWorkflow)
+        '''
+
+        # Single-thread:
+        for eachChild in children:
+            childWorkflow, childHasException = _executeAllSince(eachChild, childGlobalVar, childLocalVar, channel_layer, clientID)
+            executedChildrenWF.append(childWorkflow)
+            if childHasException == 1:
+                treeHasException = 1
+
         inputWorkflowDict['children'] = executedChildrenWF
 
     else:
@@ -139,3 +159,8 @@ def _getAllLogAndErrorAlongTree(workflowTreeDict):
         stepError = stepError + ' --- \n' + stepError
 
     return stepLog, stepError
+
+
+def _pushToFrontEnd(channel_layer, clientID, bodyDict):
+    bodyDict.update({"type": "backend.message"})
+    async_to_sync(channel_layer.group_send)("client_%s" % clientID, bodyDict)
