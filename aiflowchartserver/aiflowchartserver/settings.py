@@ -138,9 +138,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-# Global variables used by views:
-ZHIPUBASE = None
-
 # Celery setup
 # CELERY_BROKER_URL = 'pyamqp://admin:admin@localhost//'
 # CELERY_RESULT_BACKEND = 'rpc://'
@@ -171,4 +168,20 @@ CHANNEL_LAYERS = {
 
 # Daphne
 ASGI_APPLICATION = "aiflowchartserver.asgi.application"
+
+
+# Zhipu AI setups
+# Provide a static value to keep the ZHIPU base.
+ZHIPUBASE = None
+# 'glm-4' or 'codegeex-4'
+ZHIPU_MODEL = 'codegeex-4'
+
+ZHIPU_IS_ASYNC = True
+
+ZHIPU_STOP_SIGNS = ["<|endoftext|>", "<|user|>", "<|assistant|>", "<|observation|>"]
+
+ZHIPU_RETRY_INTERVAL = 2
+
+ZHIPU_MAX_RETRY = 40
+
 

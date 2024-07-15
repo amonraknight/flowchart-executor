@@ -97,7 +97,7 @@ def _parseZhipuResponse(inputResponse):
     while contentRemain and contentRemain.find(codeMark1) >= 0:
         position = contentRemain.find(codeMark1)
         # Get chat
-        if position > 0:
+        if position >= 0:
             otherMessages.append(contentRemain[:position])
             contentRemain = contentRemain[position + len(codeMark1):]
 
