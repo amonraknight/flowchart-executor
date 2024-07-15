@@ -7,12 +7,15 @@ import copy
 import types
 import json
 from concurrent.futures import ThreadPoolExecutor
+import threading
 
 from flowchartagent.models import Workflow
 from utils.importextracter import getImportScript
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+
+lock = threading.Lock()
 
 @shared_task
 def executeWorkflow(inputWorkflowDict, clientID=1):
@@ -107,7 +110,6 @@ def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}, channel_layer
         # Execute all children in a concurrent way.
 
         # Multi-thread:
-        '''
         with ThreadPoolExecutor(3) as pool:
             for eachChild in children:
                 childJob = pool.submit(_executeAllSince, eachChild, childGlobalVar, childLocalVar, channel_layer,
@@ -119,9 +121,10 @@ def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}, channel_layer
             if childHasException == 1:
                 treeHasException = 1
             executedChildrenWF.append(childWorkflow)
-        '''
+
 
         # Single-thread:
+        '''
         for eachChild in children:
             childWorkflow, childHasException = _executeAllSince(eachChild, childGlobalVar, childLocalVar, channel_layer, clientID)
             executedChildrenWF.append(childWorkflow)
@@ -129,7 +132,7 @@ def _executeAllSince(inputWorkflowDict, globalVar={}, localVar={}, channel_layer
                 treeHasException = 1
 
         inputWorkflowDict['children'] = executedChildrenWF
-
+        '''
     else:
         # Don't touch the children if not exists or not to execute.
         treeHasException = thisStepException
@@ -162,5 +165,8 @@ def _getAllLogAndErrorAlongTree(workflowTreeDict):
 
 
 def _pushToFrontEnd(channel_layer, clientID, bodyDict):
-    bodyDict.update({"type": "backend.message"})
-    async_to_sync(channel_layer.group_send)("client_%s" % clientID, bodyDict)
+    with lock:
+        bodyDict.update({"type": "backend.message"})
+        # The channel messages can't be sent in a concurrent way.
+        async_to_sync(channel_layer.group_send)("client_%s" % clientID, bodyDict)
+
